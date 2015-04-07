@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Raingular::VERSION
   spec.authors       = ["Chris Moody"]
   spec.email         = ["cmoody@transcon.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Angular for rails v1.2.26.}
+  spec.description   = %q{Angular is fastly evolving and has surpassed this version; however, no good convention over configuration assets exist and most of these methods have been developed using this version of angular.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
