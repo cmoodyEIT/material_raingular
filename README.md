@@ -1,13 +1,13 @@
 # Raingular
 
-TODO: Write a gem description
+Simple convention over configuration rails angular tie in.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'raingular'
+gem 'raingular', github: 'transcon/raingular'
 ```
 
 And then execute:
@@ -24,7 +24,7 @@ TODO: Write usage instructions here
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/raingular/fork )
+1. Fork it ( https://github.com/transcon/raingular/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
