@@ -1,4 +1,4 @@
-angular.module('AutoComplete', ['templates', 'FactoryName'])
+angular.module('AutoComplete', [ 'FactoryName'])
 
   .directive 'ngAutocomplete', ->
     restrict: 'E'
