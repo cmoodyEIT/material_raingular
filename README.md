@@ -19,8 +19,8 @@ Or install it yourself as:
     $ gem install material_raingular
 
 ## Usage
-
-TODO: Write usage instructions here
+The factories will be auto-generated when you run migrations to manually create the factories:
+    $ rake material_raingular:factories
 
 ## Contributing
 
