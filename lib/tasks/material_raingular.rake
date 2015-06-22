@@ -19,7 +19,8 @@ namespace :material_raingular do
       factories   += "angular.factories.factory('#{controller.try(:classify)}', function($resource) {return $resource("
       factories   += "'/#{controller}/:id.json', {#{ids}},{"
       routes.each do |action,route|
-        factories += "    #{action}:   { method: '#{route[:method]}', url: '#{route[:url]}'  },"
+        ary = action.to_sym == :index
+        factories += "    #{action}:   { method: '#{route[:method]}', url: '#{route[:url]}', isArray: #{ary}  },"
       end
       factories    = factories[0...-1] + "});});\n"
     end
