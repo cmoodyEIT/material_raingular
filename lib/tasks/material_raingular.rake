@@ -23,11 +23,11 @@ namespace :material_raingular do
       end
       factories    = factories[0...-1] + "});});\n"
     end
-    dirname = "#{Rails.root}/vendor/assets/javascripts/material_raingular"
+    dirname = Rails.root.join("vendor","assets","javascripts","material_raingular")
     unless File.directory?(dirname)
       FileUtils.mkdir_p(dirname)
     end
-    File.write("#{Rails.root}/vendor/assets/javascripts/material_raingular/factories.js" ,Uglifier.compile(factories,mangle: false))
+    File.write(dirname.join("factories.js") ,Uglifier.compile(factories,mangle: false))
   end
 end
 namespace :db do
