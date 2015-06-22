@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    raingular (0.0.2)
+    material_raingular (0.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -13,5 +13,5 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.7)
-  raingular!
+  material_raingular!
   rake (~> 10.0)

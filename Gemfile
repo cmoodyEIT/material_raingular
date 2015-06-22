@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in raingular.gemspec
+# Specify your gem's dependencies in material_raingular.gemspec
 gemspec
