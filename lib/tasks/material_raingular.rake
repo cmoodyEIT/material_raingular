@@ -20,7 +20,7 @@ namespace :material_raingular do
       factories   += "'/#{controller}/:id.json', {#{ids}},{"
       routes.each do |action,route|
         ary = action.to_sym == :index
-        factories += "    #{action}:   { method: '#{route[:method]}', url: '#{route[:url]}', isArray: #{ary}  },"
+        factories += "    #{action}:   { method: '#{route[:method]}', url: '#{route[:url]}.json', isArray: #{ary}  },"
       end
       factories    = factories[0...-1] + "});});\n"
     end
