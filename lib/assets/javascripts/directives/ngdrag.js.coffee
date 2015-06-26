@@ -66,15 +66,16 @@ angular.module('NgDrag', [])
         unless dragging == dropping
           orderedArray = $filter('orderBy')($scope[factory], 'position')
           index = orderedArray.indexOf(dropping)
-          unless index == 0
-            dragging.position = String(dropping.position - (dropping.position - orderedArray[index - 1].position) / 2)
-          else
-            dragging.position = String(dropping.position / 2)
-          object = {id: dragging.id, position: dragging.position}
-          object[context + '_id'] = droppingContext.id if context
-          list = $injector.get(factory)
-          list.update object, (returnData) ->
-            dragging = returnData
+          unless dragging == orderedArray[index - 1]
+            unless index == 0
+              dragging.position = parseFloat(dropping.position) - (parseFloat(dropping.position) - parseFloat(orderedArray[index - 1].position)) / 2
+            else
+              dragging.position = parseFloat(dropping.position) / 2
+            object = {id: dragging.id, position: dragging.position}
+            object[context + '_id'] = droppingContext.id if context
+            list = $injector.get(factory)
+            list.update object, (returnData) ->
+              dragging = returnData
 
   .directive 'ngDrag', ->
     link: (scope, element, attributes, ngModelCtrl) ->
