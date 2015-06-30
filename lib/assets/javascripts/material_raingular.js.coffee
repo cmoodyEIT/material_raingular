@@ -7,7 +7,7 @@
 # //= require material_raingular/factories
 # //= require factory_name
 # //= require_tree ./directives
-angular.module('customDirectives', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag',
-                                    'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean'
-                                    'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize',
+angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag',
+                                    'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table'
+                                    'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea'
                                     'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent'])
