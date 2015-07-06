@@ -9,6 +9,12 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
       html = angular.element(html)
       html[0].setAttribute("ng-model", model.split(',')[0])
       callModel = model
+      if element[0].attributes['placeholder']
+        placeholder = element[0].attributes['placeholder'].value
+      else
+        placeholder = ''
+        for word in callModel.split('.').pop().split('_')
+          placeholder += word[0].toUpperCase() + word[1..-1].toLowerCase()
       callModel += ',' + attributes.ngTrackBy if attributes.ngTrackBy
       callFunction = 'update("' + callModel + '")'
       callFunction += ';' + attributes.ngCallback if attributes.ngCallback
@@ -23,6 +29,7 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
         callFunction = callModel + ' = !' + callModel + ' ; update("' + callModel + '")'
         callFunction += ';' + attributes.ngCallback if attributes.ngCallback
         html[0].setAttribute("ng-click", callFunction)
+      html[0].setAttribute('placeholder',placeholder)
       html[0].removeAttribute('ng-update')
       element.replaceWith html
       $compile(html)(scope)
