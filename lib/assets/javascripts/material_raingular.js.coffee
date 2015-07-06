@@ -7,7 +7,10 @@
 # //= require material_raingular/factories
 # //= require factory_name
 # //= require_tree ./directives
-angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag',
-                                    'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table'
+# //= require js-routes
+# //= require dateconverter
+
+angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag', 'NgAuthorize'
+                                    'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table', 'NgWatchShow'
                                     'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea'
                                     'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent'])
