@@ -25,7 +25,7 @@ fileData = (scope,attributes) ->
 uploadFiles = (scope,element,model,id,file,parent,timeout) ->
   scope.progress = 0
   element.addClass('covered')
-  route = eval('Routes.' + element[0].attributes['ng-model'].value.split('.')[0] + '_path')(id: id) + '.json'
+  route = Routes[element[0].attributes['ng-model'].value.split('.')[0] + '_path'](id: id) + '.json'
   formData = new FormData()
   formData.append model[0] + '[id]', id
   formData.append model[0] + '[' + model[1] + ']', file
@@ -85,7 +85,17 @@ angular.module('NgUpload', [])
     restrict: 'E'
     replace: true,
     require: 'ngModel',
-    templateUrl: 'upload.html'
+    template:
+      '<span class="ng-upload">
+        <div class="ng-progress-bar">
+          <span class="bar" style="width: {{uploadProgress() || 0}}%;"></span><span class="text" style="margin-left: -{{uploadProgress() || 0}}%;">{{uploadProgress()}}%</span>
+        </div>
+        <input accept="{{accept()}}" ng-model="ngModel" type="file" /><img ng-show="show(&#39;image&#39;)" ng-src="{{file().thumb}}" />
+        <div class="button" ng-show="show(&#39;button&#39;)">
+          Select File
+        </div>
+        <a download="" href="{{file().path}}" ng-show="show(&#39;text&#39;)" target="_blank">{{file().name}}</a></span>'
+
     link: (scope, element, attributes) ->
       element.children('img').bind 'click', (event) ->
         this.parentElement.getElementsByTagName('input')[0].click()
@@ -103,7 +113,7 @@ angular.module('NgUpload', [])
         return '*'
     controller: ($scope, $element, $http, $timeout) ->
       $scope.show = (type) ->
-        options = $element[0].attributes['ng-options'].value.replace('{','').replace('}','').split(',')
+        options = $element[0].attributes['ng-upload-options'].value.replace('{','').replace('}','').split(',')
         for option in options
           if option.indexOf(type) > -1
             return true if option.indexOf('true') > -1
