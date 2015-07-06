@@ -10,7 +10,7 @@ angular.module 'NgRepeatList', ['Factories']
       list = element.injector().get(factory)
       context = {}
       context[attributes.ngContext + '_id'] = scope[attributes.ngContext].id if attributes.ngContext
-      list.query context, (data) ->
+      list.index context, (data) ->
         scope[factory] = data
         element.parent().removeClass('loading')
     template: (element, attributes) ->
@@ -29,7 +29,7 @@ angular.module 'NgRepeatList', ['Factories']
       list = element.injector().get(factory)
       context = {}
       context[attributes.ngContext + '_id'] = scope[attributes.ngContext].id if attributes.ngContext
-      list.query context, (data) ->
+      list.index context, (data) ->
         scope[factory] = data
         element.parent().removeClass('loading')
     template: (element, attributes) ->
