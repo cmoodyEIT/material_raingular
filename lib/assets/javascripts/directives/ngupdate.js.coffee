@@ -14,7 +14,7 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
       else
         placeholder = ''
         for word in callModel.split('.').pop().split('_')
-          placeholder += word[0].toUpperCase() + word[1..-1].toLowerCase()
+          placeholder += word[0].toUpperCase() + word[1..-1].toLowerCase() + ' '
       callModel += ',' + attributes.ngTrackBy if attributes.ngTrackBy
       callFunction = 'update("' + callModel + '")'
       callFunction += ';' + attributes.ngCallback if attributes.ngCallback
