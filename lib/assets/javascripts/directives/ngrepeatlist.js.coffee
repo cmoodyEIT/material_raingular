@@ -9,10 +9,23 @@ angular.module 'NgRepeatList', ['Factories']
       element.parent().addClass('loading')
       list = element.injector().get(factory)
       context = {}
-      context[attributes.ngContext + '_id'] = scope[attributes.ngContext].id if attributes.ngContext
-      list.index context, (data) ->
-        scope[factory] = data
-        element.parent().removeClass('loading')
+      if attributes.ngContext
+        name = attributes.ngContext
+        if name.match(/\_id$/)
+          watch = name
+        else
+          watch = name + '.id'
+          name += "_id"
+        scope.$watch watch, (newVal) ->
+          if newVal
+            context[name] = if scope[name].id then scope[name].id else scope[name]
+            list.index context, (data) ->
+              scope[factory] = data
+              element.parent().removeClass('loading')
+      else
+        list.index context, (data) ->
+          scope[factory] = data
+          element.parent().removeClass('loading')
     template: (element, attributes) ->
       element[0].setAttribute('ng-repeat', attributes.ngRepeatList)
       element[0].removeAttribute('ng-repeat-list')
