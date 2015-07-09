@@ -18,7 +18,7 @@ angular.module 'NgRepeatList', ['Factories']
           name += "_id"
         scope.$watch watch, (newVal) ->
           if newVal
-            context[name] = if scope[name].id then scope[name].id else scope[name]
+            context[name] = eval("scope." + watch)
             list.index context, (data) ->
               scope[factory] = data
               element.parent().removeClass('loading')

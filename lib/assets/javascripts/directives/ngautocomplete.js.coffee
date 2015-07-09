@@ -14,8 +14,8 @@ class Autocomplete
     @parent_name = @scopes.pop() if @scopes
     @list        = angular.element("<div class='autocomplete menu'></div>")
     @filter      = $filter
-    @listFactory = @element.injector().get(@factory)
     @existing_factory = @scope[@factory] || @scope.$parent[@factory]
+    @listFactory = @element.injector().get(@factory) unless @existing_factory
     @list.insertAfter(@element[0])
 
     if @parent_name
@@ -35,19 +35,11 @@ class Autocomplete
       hash[key] = val
     hash
   model: (val)=>
-    model = @scope
-    for scope in @model_name.split('.')
-      model = model[scope]
-    model = val if val
-    model
+    return @scope.$eval(@model_name + '="' + val + '"') if val
+    return @scope.$eval(@model_name)
   parent: =>
     return null unless @context
-    parent = @scope_assignment(@scope,@scopes)
-    unless parent[@parent_name] == undefined
-      parent = parent[@parent_name]
-    else
-      parent = @scope_assignment(parent,@parent_id.split('_'))
-    parent
+    return @scope.$eval(@context)
   load: ->
     scope   = @scope
     factory = @factory
@@ -68,6 +60,7 @@ class Autocomplete
     object              = {}
     object[@list_attr]  = value || ''
     scope               = @scope
+    model               = @model
     model_name          = @model_name
     filtered            = @filter('filter')((scope[@factory] || []), object )
     filtered            = @filter('orderBy')(filtered, @sort_by)
@@ -75,17 +68,11 @@ class Autocomplete
     for item in filtered
       item = angular.element "<a class='item'>" + item[@list_attr] + "</a>"
       item.bind 'click', (event) ->
-        eval("scope." + model_name + "='" + event.target.textContent + "'")
+        model(event.target.textContent)
         scope.$eval event.target.parentNode.previousSibling.attributes['ng-change-on-blur'].value
       items.push item
     @list.empty()
     @list.append(items)
-  # Private methods
-  scope_assignment: (scope,arg) =>
-    parent = scope
-    for level in arg
-      parent = parent[level] || parent.$parent[level]
-    parent
 
 angular.module('AutoComplete', [ 'FactoryName'])
 
