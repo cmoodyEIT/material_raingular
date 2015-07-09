@@ -2,20 +2,22 @@ class DateParser
   constructor: (object)->
     @object = object
   evaluate: ->
-    return @object unless typeof @object == 'object' || typeof @object == 'array'
-    if typeof @object == 'array'
-      for obj in @object
-        new DateParser(obj).evaluate
-    if typeof @object == 'object'
-      for key,value of @object
-        if typeof value == 'string'
-          @object[key] = new Date(value) if !!value.match(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/)
-    return @object
+    for i of @object
+      if @object[i] != null and typeof @object[i] == 'object'
+        new DateParser(@object[i]).evaluate()
+      else if @object[i] != null and typeof @object[i] == 'string'
+        if !!@object[i].match(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/)
+          time = new Date(@object[i])
+          time.setTime( time.getTime() + time.getTimezoneOffset()*60*1000 ) #offset timezone
+          @object[i] = time
+        else if !!@object[i].match(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]{3}[A-Z]$/)
+          @object[i] = new Date(@object[i])
+    return
 angular.factories
   .factory 'DateConverterInterceptor', ($q, $rootScope) ->
     request: (config)          -> config
     requestError: (rejection)  -> rejection
     response: (response)       ->
-      dp = new DateParser(response.data).evaluate()
+      new DateParser(response.data).evaluate()
       response
     responseError: (rejection) -> rejection
