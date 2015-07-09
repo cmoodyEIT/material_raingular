@@ -1,6 +1,7 @@
 namespace :material_raingular do
   desc "Generate Material Raingular Factories"
   task factories: :environment do
+    variances = Rails.application.config.raingular_variances
     puts "Rewriting angular factories:"
     controllers = HashWithIndifferentAccess.new
     factories = "angular.factories = angular.module('Factories', [])\n"
@@ -19,7 +20,10 @@ namespace :material_raingular do
       factories   += "angular.factories.factory('#{controller.try(:classify)}', function($resource) {return $resource("
       factories   += "'/#{controller}/:id.json', {#{ids}},{"
       routes.each do |action,route|
-        ary = action.to_sym == :index
+        ary = action.to_sym != :create && action.to_sym != :new && !(route[:url] =~ /\/:id/)
+        if (variances[controller.to_sym][action.to_sym].present? rescue false)
+          ary = variances[controller.to_sym][action.to_sym][:array]
+        end
         factories += "    #{action}:   { method: '#{route[:method]}', url: '#{route[:url]}.json', isArray: #{ary}  },"
       end
       factories    = factories[0...-1] + "});});\n"
