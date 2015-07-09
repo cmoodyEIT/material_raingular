@@ -15,6 +15,7 @@ class Autocomplete
     @list        = angular.element("<div class='autocomplete menu'></div>")
     @filter      = $filter
     @listFactory = @element.injector().get(@factory)
+    @existing_factory = @scope[@factory] || @scope.$parent[@factory]
     @list.insertAfter(@element[0])
 
     if @parent_name
@@ -54,9 +55,15 @@ class Autocomplete
     updateView = @updateView
     if @context
       return unless @parent()
-    @listFactory.index @serialize(), (data) ->
-      scope[factory] = data
+    if @existing_factory
+      scope[factory] = @existing_factory
+      scope.$watchCollection factory, (newVal) ->
+        updateView(model())
       updateView(model())
+    else
+      @listFactory.index @serialize(), (data) ->
+        scope[factory] = data
+        updateView(model())
   updateView: (value) =>
     object              = {}
     object[@list_attr]  = value || ''
@@ -76,8 +83,8 @@ class Autocomplete
   # Private methods
   scope_assignment: (scope,arg) =>
     parent = scope
-    for scope in arg
-      parent = parent[scope] || parent.$parent[scope]
+    for level in arg
+      parent = parent[level] || parent.$parent[level]
     parent
 
 angular.module('AutoComplete', [ 'FactoryName'])
