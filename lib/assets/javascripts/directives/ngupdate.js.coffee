@@ -19,8 +19,8 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
       callFunction = 'update("' + callModel + '")'
       callFunction += ';' + attributes.ngCallback if attributes.ngCallback
       if element[0].tagName == 'INPUT'
-        html[0].setAttribute("ng-change-on-blur", callFunction) if attributes.type != 'radio' && attributes.type != 'checkbox'
-        html[0].setAttribute("ng-change", callFunction)     unless attributes.type != 'radio' && attributes.type != 'checkbox'
+        html[0].setAttribute("ng-change-on-blur", callFunction) if attributes.type != 'radio' && attributes.type != 'checkbox' && attributes.type != 'hidden'
+        html[0].setAttribute("ng-change", callFunction)     unless attributes.type != 'radio' && attributes.type != 'checkbox' && attributes.type != 'hidden'
       else if element[0].tagName == 'SELECT'
         html[0].setAttribute("ng-change", callFunction)
       else if element[0].tagName == 'TEXTAREA'

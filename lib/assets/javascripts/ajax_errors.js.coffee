@@ -11,7 +11,3 @@ angular.factories
         for description in v
           $rootScope.xhr_errors.push(k + ' ' + ' ' + description)
       rejection
-  .factory 'Task', ($resource) ->
-    return $resource '/tasks/:id.json', {id: '@id'},
-      query:  { url: Routes.root_path({format: 'json'}), isArray: false },
-      update: { method: 'PUT', isArray: false }

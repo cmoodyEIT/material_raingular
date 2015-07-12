@@ -1,7 +1,7 @@
 namespace :material_raingular do
   desc "Generate Material Raingular Factories"
   task factories: :environment do
-    variances = Rails.application.config.raingular_variances
+    variances = Rails.application.config.raingular_variances rescue {}
     puts "Rewriting angular factories:"
     controllers = HashWithIndifferentAccess.new
     factories = "angular.factories = angular.module('Factories', [])\n"
