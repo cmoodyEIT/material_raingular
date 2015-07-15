@@ -69,7 +69,12 @@ angular.module('NgUpload', [])
     restrict: 'A'
     require: 'ngModel'
     link: (scope, element, attributes) ->
+      element.bind 'dragover', (event) ->
+        event.preventDefault()
+        event.stopPropagation()
       element.bind 'drop', (event) ->
+        event.preventDefault()
+        event.stopPropagation()
         file   = event.originalEvent.dataTransfer.files[0]
         selectFile(scope,event,attributes,file)
       scope.file = ->
