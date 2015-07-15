@@ -34,18 +34,23 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
       element.replaceWith html
       $compile(html)(scope)
 
-    controller: ($scope, $injector,factoryName) ->
+    controller: ($scope, $injector,factoryName, $element) ->
       $scope.update = (modelName)->
-        input = modelName.split(',')
-        trackby = input.pop() if input.length > 1
-        trackby = trackby.split(';') if trackby
-        trackby = [] unless trackby
-        data = input.splice(0,1)[0].split('.')
-        functions = input.join(',').split(')')
-        factory = factoryName(data[0])
-        object = {id: $scope[data[0]]['id']}
-        object[data[0]] = {id: $scope[data[0]]['id']}
-        object[data[0]][data[1]] = $scope[data[0]][data[1]]
+        override    = if $element[0].attributes['ng-override'] then $element[0].attributes['ng-override'].value.split('.') else []
+        input       = modelName.split(',')
+        trackby     = input.pop() if input.length > 1
+        trackby     = trackby.split(';') if trackby
+        trackby     = [] unless trackby
+        data        = input.splice(0,1)[0].split('.')
+        functions   = input.join(',').split(')')
+        factory = factoryName(override[0] || data[0])
+        if override[1]
+          object = {id: $scope.$eval(override[0]).id}
+          object[override[1]] = $scope.$eval(override[1])
+        else
+          object = {id: $scope[data[0]]['id']}
+          object[data[0]] = {id: $scope[data[0]]['id']}
+          object[data[0]][data[1]] = $scope[data[0]][data[1]]
         list = $injector.get(factory)
         list.update object, (returnData) ->
           for tracked in trackby
