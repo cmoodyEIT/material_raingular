@@ -4,20 +4,24 @@ angular.module('Table', [])
     link: (scope, element, attributes) ->
       tableLoaded = ->
         element.find('tbody').find('td').length > 0
-      minimumParentHeight = ->
+      parentHeights = ->
         heights = [element[0].offsetHeight]
         parent = element[0].parentElement
         until !parent
           heights.push(parent.offsetHeight)
           parent = parent.parentElement
-        Math.min.apply(Math, heights)
+      minimumParentHeight = ->
+        Math.min.apply(Math, parentHeights())
+      maximumParentHeight = ->
+        Math.max.apply(Math, parentHeights())
       tbody = ->
         angular.element(element.find('tbody')[0])
       thead = ->
         angular.element(element.find('thead')[0])
       initialize = ->
         parent = angular.element(element[0].parentElement)
-        parent.css('height', minimumParentHeight() + 'px')
+        parent.css('min-height', minimumParentHeight() + 'px')
+        parent.css('max-height', maximumParentHeight() + 'px')
         parent.css('overflow-y', 'hidden')
         for col in element.find('th')
           col.style.width = col.offsetWidth + 'px'
