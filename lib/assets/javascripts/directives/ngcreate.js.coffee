@@ -5,10 +5,11 @@ angular.module 'NgCreate', ['Factories', 'FactoryName']
     link: (scope, element, attributes) ->
       element.bind 'click', (event) ->
         [parentName, listName] = attributes.ngContext.split('.') if attributes.ngContext
-        attr = eval('(' + attributes.ngAttributes + ')') || {}
+        attr = scope.$eval('(' + attributes.ngAttributes + ')') || {}
         scope.create(attributes.ngCreate,parentName,listName,attr)
-    controller: ($scope, $injector, factoryName) ->
+    controller: ($scope, $injector, factoryName, $element) ->
       $scope.create = (modelName,parentName,listName,attributes) ->
+        addTo = $element[0].attributes['ng-add-to'].value if $element[0].attributes['ng-add-to']
         factory = factoryName(modelName)
         list = $injector.get(factory)
         object = {}
@@ -17,6 +18,8 @@ angular.module 'NgCreate', ['Factories', 'FactoryName']
           object[parentName]         = $scope[parentName]    unless parentName.indexOf('_id') < 0
           object[parentName + '_id'] = $scope[parentName].id     if parentName.indexOf('_id') < 0
         list.create object, (returnData) ->
+          if addTo
+            $scope[addTo].push(returnData)
           if listName
             scope = if $scope[parentName] then $scope else $scope.$parent
             scope[parentName] = {} unless scope[parentName]
