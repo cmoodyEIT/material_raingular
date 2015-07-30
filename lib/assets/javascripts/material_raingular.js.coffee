@@ -10,6 +10,7 @@
 # //= require js-routes
 # //= require dateconverter
 # //= require ajax_errors
+# //= require identifier_interceptor
 
 angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag', 'NgAuthorize'
                                     'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table', 'NgWatchShow'
