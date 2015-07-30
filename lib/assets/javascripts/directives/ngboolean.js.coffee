@@ -10,7 +10,7 @@ angular.module 'NgBoolean', ['Factories', 'FactoryName']
       callFunction += ';' + attributes.ngCallback if attributes.ngCallback
       element.attr("call-function", callFunction)
       element.bind 'click', ->
-        scope.$eval(element.attr("call-function"))
+        scope.$eval(element.attr("call-function")) unless attributes.disabled
       scope.update = (modelName)->
         input = modelName.split(',')
         trackby = input.pop() if input.length > 1
