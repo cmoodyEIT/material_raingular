@@ -1,6 +1,7 @@
 # //= require angular
 # //= require angular-route
 # //= require angular-resource
+# //= require angular-messages
 # //= require angular-animate
 # //= require angular-aria
 # //= require angular-material.min
@@ -15,4 +16,5 @@
 angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag', 'NgAuthorize'
                                     'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table', 'NgWatchShow'
                                     'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea'
-                                    'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent'])
+                                    'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent'
+                                    'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource'])
