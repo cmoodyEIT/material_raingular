@@ -70,6 +70,11 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
       watcher = ->
         scope.$watch modelName, (updated,old) ->
           update(updated) unless updated == old
+      equiv = (left,right) ->
+        return true if left == right
+        return true if (!!left && !!right) == false
+        false
+
       update = (value) ->
         override    = if attributes.ngOverride then attributes.ngOverride.split('.') else []
         functions   = if attributes.ngCallback then attributes.ngCallback.split(';') else []
@@ -88,7 +93,8 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
         list.update object, (returnData) ->
           for tracked in trackby
             scope[data[0]][tracked] = returnData[tracked]
-          scope[data[0]][data[1]] = returnData[data[1]] if scope[data[0]][data[1]] == object[data[0]][data[1]]
+          scope[data[0]][data[1]] = returnData[data[1]] if equiv(scope[data[0]][data[1]], object[data[0]][data[1]]) && !equiv(scope[data[0]][data[1]], returnData[data[1]])
+          scope[data[0]].errors   = returnData.errors
           callFunctions = []
           for callFunction in functions
             [match,func,args] = callFunction.match(/(.*)\((.*)\)/)
