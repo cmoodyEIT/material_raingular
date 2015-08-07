@@ -1,3 +1,3 @@
 module MaterialRaingular
-  VERSION = "0.0.2.alpha"
+  VERSION = "0.0.2.1.alpha"
 end
