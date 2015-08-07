@@ -22,7 +22,7 @@ fileData = (scope,attributes) ->
       data.thumb = scope[unparsedModel[0]].thumb.url if scope[unparsedModel[0]].thumb
   return data
 
-uploadFiles = (scope,element,model,id,file,parent,timeout) ->
+uploadFiles = (scope,element,model,id,file,parent,timeout,callback) ->
   scope.progress = 0
   element.addClass('covered')
   route = Routes[element[0].attributes['ng-model'].value.split('.')[0] + '_path'](id: id) + '.json'
@@ -44,7 +44,7 @@ uploadFiles = (scope,element,model,id,file,parent,timeout) ->
         scope[model[0]].thumb = data.thumb
         scope.progress = 100
         element.removeClass('covered')
-
+        scope.$eval(callback) if callback
     else if this.readyState == 4 && this.status > 399
       failed()
   , false
@@ -81,8 +81,10 @@ angular.module('NgUpload', [])
         fileData(scope,attributes)
 
     controller: ($scope, $element, $http, $timeout) ->
+      callback = ->
+        $element[0].attributes['ng-callback'].value if $element[0].attributes['ng-callback']
       $scope.uploadFiles = (model,id,file,parent) ->
-        uploadFiles($scope,$element,model,id,file,parent,$timeout)
+        uploadFiles($scope,$element,model,id,file,parent,$timeout,callback())
       $scope.progress = 0
       $scope.uploadProgress = ->
         return $scope.progress
@@ -117,6 +119,8 @@ angular.module('NgUpload', [])
         return attributes.accept if attributes.accept
         return '*'
     controller: ($scope, $element, $http, $timeout) ->
+      callback = ->
+        $element[0].attributes['ng-callback'].value if $element[0].attributes['ng-callback']
       $scope.show = (type) ->
         options = $element[0].attributes['ng-upload-options'].value.replace('{','').replace('}','').split(',')
         for option in options
@@ -124,4 +128,4 @@ angular.module('NgUpload', [])
             return true if option.indexOf('true') > -1
         return false
       $scope.uploadFiles = (model,id,file,parent) ->
-        uploadFiles($scope,$element,model,id,file,parent,$timeout)
+        uploadFiles($scope,$element,model,id,file,parent,$timeout,callback())
