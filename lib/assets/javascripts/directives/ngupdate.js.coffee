@@ -88,20 +88,25 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
           object = {id: scope[data[0]]['id']}
           object[data[0]] = {id: scope[data[0]]['id']}
           object[data[0]][data[1]] = scope[data[0]][data[1]]
+          object[data[0]].lock_version = scope[data[0]].lock_version
         list = $injector.get(factory)
 
-        list.update object, (returnData) ->
-          for tracked in trackby
-            scope[data[0]][tracked] = returnData[tracked]
-          scope[data[0]][data[1]] = returnData[data[1]] if equiv(scope[data[0]][data[1]], object[data[0]][data[1]]) && !equiv(scope[data[0]][data[1]], returnData[data[1]])
-          scope[data[0]].errors   = returnData.errors
-          callFunctions = []
-          for callFunction in functions
-            [match,func,args] = callFunction.match(/(.*)\((.*)\)/)
-            if typeof scope[func] == 'function'
-              scope[func](args,returnData)
-            else if typeof window[func] == 'function'
-              window[func](args,returnData)
+        unless scope[data[0]].currently_updating
+          console.dir scope[data[0]].currently_updating
+          scope[data[0]].currently_updating = true
+          list.update object, (returnData) ->
+            scope[data[0]].currently_updating = false
+            for tracked in trackby
+              scope[data[0]][tracked] = returnData[tracked]
+            scope[data[0]][data[1]] = returnData[data[1]] if equiv(scope[data[0]][data[1]], object[data[0]][data[1]]) && !equiv(scope[data[0]][data[1]], returnData[data[1]])
+            scope[data[0]].errors   = returnData.errors
+            callFunctions = []
+            for callFunction in functions
+              [match,func,args] = callFunction.match(/(.*)\((.*)\)/)
+              if typeof scope[func] == 'function'
+                scope[func](args,returnData)
+              else if typeof window[func] == 'function'
+                window[func](args,returnData)
       if element[0].tagName == 'INPUT'
         if attributes.type == 'radio' || attributes.type == 'checkbox' || attributes.type == 'date'
           element.bind 'input', (event) ->
