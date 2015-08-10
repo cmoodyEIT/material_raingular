@@ -10,6 +10,7 @@ angular.module('Table', [])
         until !parent
           heights.push(parent.offsetHeight)
           parent = parent.parentElement
+        heights
       minimumParentHeight = ->
         Math.min.apply(Math, parentHeights())
       maximumParentHeight = ->
@@ -19,6 +20,7 @@ angular.module('Table', [])
       thead = ->
         angular.element(element.find('thead')[0])
       initialize = ->
+        bodyWatcher() if bodyWatcher
         parent = angular.element(element[0].parentElement)
         parent.css('min-height', minimumParentHeight() + 'px')
         parent.css('max-height', maximumParentHeight() + 'px')
@@ -30,6 +32,12 @@ angular.module('Table', [])
         theight = minimumParentHeight() - thead()[0].offsetHeight - 20
         tbody().css('display', 'block').css('overflow-y', 'auto').css('height', theight + 'px').css('overflow-x', 'hidden')
         thead().css('display','block').css('width', tbody().find('tr')[0].offsetWidth + 'px')
+        bodyWatcher = scope.$watch bodyWidth, (val,old) ->
+          unless val == old
+            $timeout ->
+              reinitialize()
+      bodyWidth = ->
+        tbody()[0].offsetWidth
       reinitialize = ->
         tbody().css('display','')
         thead().css('display','')
