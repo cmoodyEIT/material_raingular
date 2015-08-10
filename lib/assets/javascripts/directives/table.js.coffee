@@ -5,8 +5,11 @@ angular.module('Table', [])
       tableLoaded = ->
         element.find('tbody').find('td').length > 0
       parentHeights = ->
-        heights = [element[0].offsetHeight]
-        parent = element[0].parentElement
+        heights = []
+        potential = element[0]
+        until parent
+          potential = potential.parentElement
+          parent = potential if (potential.tagName == attributes.stickyHeader.toUpperCase() || !attributes.stickyHeader)
         until !parent
           heights.push(parent.offsetHeight)
           parent = parent.parentElement
