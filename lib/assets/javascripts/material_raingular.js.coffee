@@ -6,6 +6,7 @@
 # //= require angular-animate
 # //= require angular-aria
 # //= require angular-material.min
+# //= require material_filters
 # //= require material_raingular/factories
 # //= require factory_name
 # //= require_tree ./directives
@@ -18,4 +19,4 @@ angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBl
                                     'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table', 'NgWatchShow'
                                     'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea'
                                     'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent'
-                                    'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource'])
+                                    'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource', 'materialFilters'])
