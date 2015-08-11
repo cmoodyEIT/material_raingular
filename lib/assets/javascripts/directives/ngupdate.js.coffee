@@ -92,7 +92,6 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
         list = $injector.get(factory)
 
         unless scope[data[0]].currently_updating
-          console.dir scope[data[0]].currently_updating
           scope[data[0]].currently_updating = true
           list.update object, (returnData) ->
             scope[data[0]].currently_updating = false

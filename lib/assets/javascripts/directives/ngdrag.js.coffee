@@ -43,13 +43,14 @@ angular.module('NgDrag', [])
         for word in raw_factory
           factory.push(word.charAt(0).toUpperCase() + word.slice(1))
         factory = factory.join('')
+        list_name = attributes.ngParent || factory
         dragged = DragHolder.get()
         dragging = dragged.scope[dragged.dragging]
         if dragged.context
           draggingContext = dragged.scope[dragged.context]
           droppingContext = scope[attributes.ngContext]
           if draggingContext != droppingContext
-            dragged.scope[factory].splice(dragged.scope[factory].indexOf(dragging),1)
+            dragged.scope[list_name].drop(dragging)
             scope[factory].push(dragging)
         dropping = scope[attributes.ngPositionable]
         if attributes.ngDisabled
@@ -60,11 +61,11 @@ angular.module('NgDrag', [])
         else
           bool = false
         unless bool
-          scope.setPosition(dragging,dropping,draggingContext,droppingContext,attributes.ngContext,factory)
+          scope.setPosition(dragging,dropping,draggingContext,droppingContext,attributes.ngContext,factory,list_name)
     controller: ($scope, $element, $filter, $injector) ->
-      $scope.setPosition = (dragging,dropping,draggingContext,droppingContext,context,factory) ->
+      $scope.setPosition = (dragging,dropping,draggingContext,droppingContext,context,factory,list_name) ->
         unless dragging == dropping
-          orderedArray = $filter('orderBy')($scope[factory], 'position')
+          orderedArray = $filter('orderBy')($scope[list_name], 'position')
           index = orderedArray.indexOf(dropping)
           unless dragging == orderedArray[index - 1]
             unless index == 0
