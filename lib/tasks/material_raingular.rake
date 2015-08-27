@@ -3,15 +3,21 @@ namespace :material_raingular do
   task factories: :environment do
     variances = Rails.application.config.raingular_variances rescue {}
     puts "Rewriting angular factories:"
-    controllers = HashWithIndifferentAccess.new
     factories = "angular.factories = angular.module('Factories', [])\n"
+    controllers = HashWithIndifferentAccess.new
     Rails.application.routes.routes.each do |route|
       unless route.constraints[:request_method].nil? || route.defaults[:controller].nil? || (route.app.constraints.present? rescue false)
         controllers[route.defaults[:controller]] ||= {}
         controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] ||= []
         controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] |= route.parts
-        action = (route.parts - [:id, :format]).present? ? "#{(route.parts - [:id, :format])[0][0..-4]}_#{route.defaults[:action]}" : route.defaults[:action]
-        controllers[route.defaults[:controller]][action] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
+        (route.parts - [:id, :format]).each do |parent|
+          action  = route.defaults[:action].to_sym
+          method  = [:index, :show].include?(action) ? '' : "#{action}_"
+          method += route.defaults[:controller].send(action == :index ? :pluralize : :singularize)
+          controllers[parent[0..-4].pluralize] ||= {}
+          controllers[parent[0..-4].pluralize][method] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
+        end
+        controllers[route.defaults[:controller]][route.defaults[:action]] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
       end
     end
     controllers.each do |controller,routes|
