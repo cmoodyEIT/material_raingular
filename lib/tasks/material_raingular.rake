@@ -10,7 +10,8 @@ namespace :material_raingular do
         controllers[route.defaults[:controller]] ||= {}
         controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] ||= []
         controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] |= route.parts
-        controllers[route.defaults[:controller]][route.defaults[:action]] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
+        action = (route.parts - [:id, :format]).present? ? "#{(route.parts - [:id, :format])[0][0..-4]}_#{route.defaults[:action]}" : route.defaults[:action]
+        controllers[route.defaults[:controller]][action] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
       end
     end
     controllers.each do |controller,routes|
