@@ -13,13 +13,13 @@ namespace :material_raingular do
         (route.parts - [:id, :format]).each do |parent|
           action  = route.defaults[:action].to_sym
           method  = [:index, :show].include?(action) ? '' : "#{action}_"
-          method += route.defaults[:controller].send(action == :index ? :pluralize : :singularize)
+          method += route.defaults[:controller].send(action == :index ? :pluralize : :singularize).gsub(/[^0-9A-Za-z]/, '_')
           controllers[parent[0..-4].pluralize] ||= {}
           controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] ||= []
           controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] |= route.parts
           controllers[parent[0..-4].pluralize][method] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
         end
-        controllers[route.defaults[:controller]][route.defaults[:action]] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
+        controllers[route.defaults[:controller]][route.defaults[:action].gsub(/[^0-9A-Za-z]/, '_')] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
       end
     end
     controllers.each do |controller,routes|
