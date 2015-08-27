@@ -15,6 +15,8 @@ namespace :material_raingular do
           method  = [:index, :show].include?(action) ? '' : "#{action}_"
           method += route.defaults[:controller].send(action == :index ? :pluralize : :singularize)
           controllers[parent[0..-4].pluralize] ||= {}
+          controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] ||= []
+          controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] |= route.parts
           controllers[parent[0..-4].pluralize][method] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
         end
         controllers[route.defaults[:controller]][route.defaults[:action]] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
