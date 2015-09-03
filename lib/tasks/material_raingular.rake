@@ -29,7 +29,7 @@ namespace :material_raingular do
       factories   += "angular.factories.factory('#{controller.try(:classify)}', function($resource) {return $resource("
       factories   += "'/#{controller}/:id.json', {#{ids}},{"
       routes.each do |action,route|
-        ary = action.to_sym != :create && action.to_sym != :new && !(route[:url] =~ /\/:id/)
+        ary = !(action.to_s =~ /^create/) && !(action.to_s =~ /^new/) && !(route[:url] =~ /\/:id/)
         if (variances[controller.to_sym][action.to_sym].present? rescue false)
           ary = variances[controller.to_sym][action.to_sym][:array]
         end
