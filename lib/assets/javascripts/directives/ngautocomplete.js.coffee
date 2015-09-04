@@ -102,34 +102,33 @@ angular.module('AutoComplete', [ 'FactoryName'])
     link: (scope, element, attributes, ngModel) ->
       if element[0].tagName == 'INPUT'
         element.bind 'focus', ->
-          pos = element.position()
+          pos = element.position() if element.position
           element.next()[0].style.left = '0px'
         element.bind 'blur', ->
-          element.parent().find('.active').removeClass('active')
+          active = angular.element(element.next()[0].getElementsByClassName('active')[0])
+          active.removeClass('active')
           ngModel.$setViewValue(element.val())
           ngModel.$render()
         element.bind 'keydown', (input)->
+          keypress = (direction) ->
+            index = if direction == 'next' then 0 else element.next().find('a').length - 1
+            selected = angular.element(element.next()[0].getElementsByClassName('active')[0])
+            if selected.hasClass('active')
+              selected.removeClass('active')
+              until complete
+                selected = angular.element(selected[0][direction + 'Sibling']) if selected[0]
+                complete = !!selected[0]
+                complete = selected[0].tagName == 'A' if complete
+                complete = true if !selected[0]
+            selected = angular.element(element.next().find('a')[index]) unless selected[0]
+            ind = 0
+            for el,i in element.next()[0].getElementsByTagName('a')
+              ind = i if el == selected[0]
+            scroll = selected[0].scrollHeight * ind
+            selected[0].parentElement.scrollTop = scroll
+            selected.addClass('active')
+            element.val(selected.text())
           if input.keyCode == 40
-            selected = element.next().find('a.active')
-            if selected.hasClass('active')
-              selected.removeClass('active')
-              selected = selected.next('a')
-            else
-              selected = element.next().find('a').first()
-            if !selected.html() then selected = element.next().find('a').first()
-            scroll = selected[0].scrollHeight * element.next().find('a').index(selected)
-            selected[0].parentElement.scrollTop = scroll
-            selected.addClass('active')
-            element.val(selected.text())
+            keypress('next')
           if input.keyCode == 38
-            selected = element.next().find('a.active')
-            if selected.hasClass('active')
-              selected.removeClass('active')
-              selected = selected.prev('a')
-            else
-              selected = element.next().find('a').last()
-            if !selected.html() then selected = element.next().find('a').last()
-            scroll = selected[0].scrollHeight * element.next().find('a').index(selected)
-            selected[0].parentElement.scrollTop = scroll
-            selected.addClass('active')
-            element.val(selected.text())
+            keypress('previous')
