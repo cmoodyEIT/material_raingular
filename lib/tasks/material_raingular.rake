@@ -7,19 +7,27 @@ namespace :material_raingular do
     controllers = HashWithIndifferentAccess.new
     Rails.application.routes.routes.each do |route|
       unless route.constraints[:request_method].nil? || route.defaults[:controller].nil? || (route.app.constraints.present? rescue false)
-        controllers[route.defaults[:controller]] ||= {}
-        controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] ||= []
-        controllers[route.defaults[:controller]][:parent_model_name_and_format_symbol] |= route.parts
+        controller = route.defaults[:controller]
+        controllers[controller] ||= {}
+        controllers[controller][:parent_model_name_and_format_symbol] ||= []
+        controllers[controller][:parent_model_name_and_format_symbol] |= route.parts
         (route.parts - [:id, :format]).each do |parent|
           action  = route.defaults[:action].to_sym
           method  = [:index, :show].include?(action) ? '' : "#{action}_"
-          method += route.defaults[:controller].send(action == :index ? :pluralize : :singularize).gsub(/[^0-9A-Za-z]/, '_')
+          method += controller.send(action == :index ? :pluralize : :singularize).gsub(/[^0-9A-Za-z]/, '_')
           controllers[parent[0..-4].pluralize] ||= {}
           controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] ||= []
           controllers[parent[0..-4].pluralize][:parent_model_name_and_format_symbol] |= route.parts
+          controllers[parent[0..-4].pluralize][method] ||= {}
           controllers[parent[0..-4].pluralize][method] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
         end
-        controllers[route.defaults[:controller]][route.defaults[:action].gsub(/[^0-9A-Za-z]/, '_')] = {url: route.path.spec.to_s.gsub('(.:format)',''), method: route.constraints[:request_method].inspect.delete('/^$')}
+        action = route.defaults[:action].gsub(/[^0-9A-Za-z]/, '_')
+        controllers[controller][action] ||= {}
+        current_url  = controllers[controller][action][:url]
+        proposed_url = route.path.spec.to_s.gsub('(.:format)','')
+        if current_url.nil? || (current_url.to_s.length > proposed_url.length)
+          controllers[controller][action] = {url: proposed_url, method: route.constraints[:request_method].inspect.delete('/^$')}
+        end
       end
     end
     controllers.each do |controller,routes|
