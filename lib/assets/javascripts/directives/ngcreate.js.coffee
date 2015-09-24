@@ -15,8 +15,10 @@ angular.module 'NgCreate', ['Factories', 'FactoryName']
         object = {}
         object[modelName] = attributes
         if parentName
-          object[parentName]         = $scope[parentName]    unless parentName.indexOf('_id') < 0
-          object[parentName + '_id'] = $scope[parentName].id     if parentName.indexOf('_id') < 0
+          object[modelName][parentName]         = $scope[parentName]    unless parentName.indexOf('_id') < 0
+          object[modelName][parentName + '_id'] = $scope[parentName].id     if parentName.indexOf('_id') < 0
+          object[parentName]                    = $scope[parentName]    unless parentName.indexOf('_id') < 0
+          object[parentName + '_id']            = $scope[parentName].id     if parentName.indexOf('_id') < 0
         list.create object, (returnData) ->
           if addTo
             $scope[addTo].push(returnData)

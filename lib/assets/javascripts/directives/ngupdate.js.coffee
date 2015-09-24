@@ -18,6 +18,7 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
           placeholder += word[0].toUpperCase() + word[1..-1].toLowerCase() + ' '
       callModel += ',' + attributes.ngTrackBy if attributes.ngTrackBy
       callFunction = 'update("' + callModel + '")'
+      callFunction += ';' + attributes.ngCallback if attributes.ngCallback
       if element[0].tagName == 'INPUT'
         html[0].setAttribute("ng-change-on-blur", callFunction) if attributes.type != 'radio' && attributes.type != 'checkbox' && attributes.type != 'hidden'
         html[0].setAttribute("ng-change", callFunction)     unless attributes.type != 'radio' && attributes.type != 'checkbox' && attributes.type != 'hidden'
@@ -27,6 +28,7 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
         html[0].setAttribute("ng-change-debounce", callFunction)
       else
         callFunction = callModel + ' = !' + callModel + ' ; update("' + callModel + '")'
+        callFunction += ';' + attributes.ngCallback if attributes.ngCallback
         html[0].setAttribute("ng-click", callFunction)
       html[0].setAttribute('placeholder',placeholder)
       html[0].removeAttribute('ng-update')
@@ -59,4 +61,3 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
           for callFunction in functions
             callFunctions.push(callFunction + ',' + JSON.stringify(returnData) + ')') if callFunction.length > 0
           $scope.$eval( callFunctions.join('') ) if callFunctions.join('').length > 0
-          ngCallbackCtrl.evaluate(returnData) if !!ngCallbackCtrl
