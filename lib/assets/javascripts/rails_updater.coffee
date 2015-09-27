@@ -7,7 +7,6 @@ class RailsUpdate
     @atomName    = (override || model).split('.')[1]
     @override    = !!override
     @factory     = @injector.get(@factoryName(@modelName))
-    @object      = {id: scope[@modelName].id}
     @ngModelCtrl = controllers.shift()
     @controllers = controllers
     return @
@@ -16,12 +15,13 @@ class RailsUpdate
     return true if (!!left && !!right) == false
     false
   update: (value) ->
-    @value       = if @override then scope.$eval(@atomName) else value
-    @object[@atomName] = value
+    @value = if @override then scope.$eval(@atomName) else value
+    object = {id: @scope.$eval(@modelName).id}
+    object[@atomName] = value
     unless @scope[@modelName].currently_updating
       @scope[@modelName].currently_updating = true
       up = @
-      @factory.update @object, (returnData) ->
+      @factory.update object, (returnData) ->
         up.scope[up.modelName].currently_updating = false
         unless up.equiv(up.ngModelCtrl.$viewValue,returnData[up.atomName])
           up.ngModelCtrl.$setModelValue = returnData[up.atomName]

@@ -1,5 +1,5 @@
 class ElementUpdate
-  constructor: (scope,element,attributes,controllers,RailsUpdater) ->
+  constructor: (scope,element,attributes,controllers,RailsUpdater,timeout) ->
     [@ngModelCtrl,@ngCallbackCtrl,@ngTrackByCtrl] = controllers
     @updater     = RailsUpdater.new(scope,controllers,attributes.ngModel,attributes.ngOverride)
     @type        = attributes.type
@@ -9,6 +9,7 @@ class ElementUpdate
     @scope       = scope
     @element     = element
     @placeholder = attributes.placeholder
+    @timeout     = timeout
     @bindInput()          if @isInput
     @bindElement()    unless @isInput
     @setPlaceholder() unless @placeholder
@@ -21,31 +22,32 @@ class ElementUpdate
     if @type == 'radio' || @type == 'date'
       @element.bind 'input', (event) ->
         return unless eu.ngModelCtrl.$valid
-          eu.updater.update(element.val())
+          eu.updater.update(eu.element.val())
     else if @type == 'hidden'
       @watcher()
     else if @type == 'checkbox'
       @element.bind 'click', (event) ->
-        eu.updater.update(element.val())
+        eu.updater.update(eu.element.val())
     else
       oldValue = null
       @element.bind 'focus', ->
         eu.scope.$apply ->
           oldValue = eu.element.val()
       @element.bind 'blur', (event) ->
-        delay = if @element.hasClass('autocomplete') then 300 else 0
-        $timeout ->
-          @scope.$apply ->
+        delay = if eu.element.hasClass('autocomplete') then 300 else 0
+        eu.timeout ->
+          eu.scope.$apply ->
             newValue = @element.val()
             @updater.update(newValue) if (newValue != oldValue)
         , delay
 
   bindElement: ->
+    eu = @
     if @tagName == 'TEXTAREA'
       @element.bind 'keyup', ->
-        $timeout.cancel(scope.debounce)
-        scope.debounce = $timeout ->
-          eu.updater.update(element.val())
+        eu.timeout.cancel(eu.debounce)
+        eu.debounce = eu.timeout ->
+          eu.updater.update(eu.element.val())
         ,750
     else
       @watcher()
@@ -61,4 +63,4 @@ angular.module 'MdUpdate', ['Factories', 'FactoryName','RailsUpdater']
     require:  ['ngModel','?ngCallback','?ngTrackBy']
 
     link: (scope, element, attributes, ngControllers) ->
-      new ElementUpdate(scope,element,attributes,ngControllers, RailsUpdater)
+      new ElementUpdate(scope,element,attributes,ngControllers, RailsUpdater,$timeout)
