@@ -1,24 +1,21 @@
 angular.module 'NgDestroy', ['Factories']
 
-  .directive 'ngDestroy', ($timeout, $compile) ->
+  .directive 'ngDestroy', ($injector, factoryName) ->
     restrict: 'A'
-    link: (scope, element, attributes) ->
+    require: '?ngCallback'
+    link: (scope, element, attributes, ngCallbackCtrl) ->
       element.bind 'click', (event) ->
-        scope.destroy(attributes.ngDestroy,attributes.ngContext)
-    controller: ($scope, $injector) ->
-      $scope.destroy = (modelName,listName) ->
-        raw_factory = modelName.split('_')
-        factory=[]
-        for word in raw_factory
-          factory.push(word.charAt(0).toUpperCase() + word.slice(1))
-        factory = factory.join('')
+        destroy(attributes.ngDestroy,attributes.ngContext)
+      destroy = (modelName,listName) ->
+        factory = factoryName(modelName)
         if listName
-          list = $scope
+          list = scope
           for scope in listName.split('.')
             list = list[scope]
         else
-          list = $scope[factory]
-        list.splice(list.indexOf($scope[modelName]),1)
+          list = scope[factory]
+        list.drop(scope[modelName])
         list = $injector.get(factory)
-        object = {id: $scope[modelName].id}
-        list.delete object
+        object = {id: scope[modelName].id}
+        list.delete object, (returnData)->
+          ngCallbackCtrl.evaluate(returnData) if !!ngCallbackCtrl
