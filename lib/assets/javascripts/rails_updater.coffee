@@ -17,7 +17,8 @@ class RailsUpdate
   update: (value) ->
     @value = if @override then scope.$eval(@atomName) else value
     object = {id: @scope.$eval(@modelName).id}
-    object[@atomName] = value
+    object[@modelName] = {}
+    object[@modelName][@atomName] = value
     unless @scope[@modelName].currently_updating
       @scope[@modelName].currently_updating = true
       up = @
