@@ -37,8 +37,8 @@ class ElementUpdate
         delay = if eu.element.hasClass('autocomplete') then 300 else 0
         eu.timeout ->
           eu.scope.$apply ->
-            newValue = @element.val()
-            @updater.update(newValue) if (newValue != oldValue)
+            newValue = eu.element.val()
+            eu.updater.update(newValue) if (newValue != oldValue)
         , delay
 
   bindElement: ->
