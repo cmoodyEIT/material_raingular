@@ -10,8 +10,8 @@ angular.module 'NgDestroy', ['Factories']
         factory = factoryName(modelName)
         if listName
           list = scope
-          for scope in listName.split('.')
-            list = list[scope]
+          for childScope in listName.split('.')
+            list = list[childScope]
         else
           list = scope[factory]
         list.drop(scope[modelName])
