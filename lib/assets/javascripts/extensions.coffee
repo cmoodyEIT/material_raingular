@@ -61,3 +61,7 @@ Array.prototype.unique = (filterOn) ->
         break
     newItems.push(item) if (!isDuplicate)
   return newItems
+String.prototype.to_f = ->
+  return parseFloat(this)
+String.prototype.to_i = ->
+  return parseInt(this)

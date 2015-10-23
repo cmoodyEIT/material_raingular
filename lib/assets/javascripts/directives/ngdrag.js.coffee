@@ -62,10 +62,10 @@ angular.module('NgDrag', [])
           bool = false
         unless bool
           scope.setPosition(dragging,dropping,draggingContext,droppingContext,attributes.ngContext,factory,list_name)
-    controller: ($scope, $element, $filter, $injector) ->
+    controller: ($scope, $element, $filter, $injector,$parse) ->
       $scope.setPosition = (dragging,dropping,draggingContext,droppingContext,context,factory,list_name) ->
         unless dragging == dropping
-          orderedArray = $filter('orderBy')($scope[list_name], 'position')
+          orderedArray = $filter('orderBy')($parse(list_name)($scope), 'position')
           index = orderedArray.indexOf(dropping)
           unless dragging == orderedArray[index - 1]
             unless index == 0
