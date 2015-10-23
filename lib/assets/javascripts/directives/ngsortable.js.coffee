@@ -4,7 +4,7 @@ angular.module('NgSortable', [])
       '<span>' + element[0].innerHTML + '</span><i class="sort"></i>'
     link: (scope,element,attributes) ->
       scope.sortableField = (resource)->
-        return 'position' unless !!scope.howToSortField
+        return resource.position unless !!scope.howToSortField
         scope.howToSortField(resource)
       sortableFunc = $parse(attributes.ngSortable)
       icon = element.find('i')
