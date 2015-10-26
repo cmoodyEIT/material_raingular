@@ -65,3 +65,18 @@ String.prototype.to_f = ->
   return parseFloat(this)
 String.prototype.to_i = ->
   return parseInt(this)
+Array.prototype.dup = ->
+  return @.slice(0)
+Array.prototype.where = (obj) ->
+  equiv = (first,second) ->
+    return true if first == second
+    if !isNaN(first) && !isNaN(second)
+      return true if parseFloat(first) == parseFloat(second)
+    return false
+  result = []
+  for entry in @
+    addEntry = true
+    for key,value of obj
+      addEntry = addEntry && equiv(entry[key], value)
+    result.push(entry) if addEntry
+  result
