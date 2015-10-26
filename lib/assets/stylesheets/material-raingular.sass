@@ -1,0 +1,44 @@
+div.filtered-select
+  position: fixed
+  z-index: 1001
+  background-color: white
+  margin: 0
+  padding: 0
+  width: 100%
+  height: 0
+  overflow: hidden
+  left: 0
+  top: 0
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)
+  &.active
+    height: 100%
+  input
+    width: 100%
+  ul
+    overflow: hidden
+    overflow-y: auto
+    list-style: none
+    width: 100%
+    margin: 0
+    padding: 0
+    li
+      padding-left: 5%
+      padding-right: 5%
+      overflow: hidden
+      text-overflow: ellipsis
+      line-height: 48px
+      height: 48px
+      font-size: 14px
+      white-space: nowrap
+      cursor: pointer
+      box-shadow: 0 4px 2px -2px rgba(0,0,0,0.14)
+  &.bottom
+    top: 67%
+    z-index: 1000
+    &.active
+      height: 33%
+ng-filtered-select
+  display: block
+  width: 100%
+  overflow: hidden
+  text-overflow: ellipsis

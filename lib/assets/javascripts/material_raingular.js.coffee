@@ -21,4 +21,4 @@ angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBl
                                     'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea', 'MdUpdate'
                                     'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent', 'RailsUpdater'
                                     'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource', 'materialFilters', 'NgCallback'
-                                    'NgSortable'])
+                                    'NgSortable', 'FilteredSelect'])
