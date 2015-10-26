@@ -1,10 +1,11 @@
 class ElementUpdate
-  constructor: (scope,element,attributes,controllers,RailsUpdater,timeout) ->
+  constructor: (scope,element,attributes,controllers,RailsUpdater,timeout,parse) ->
     [@ngModelCtrl,@ngCallbackCtrl,@ngTrackByCtrl] = controllers
     @updater     = RailsUpdater.new(scope,controllers,attributes.ngModel,attributes.ngOverride)
     @type        = attributes.type
     @tagName     = element[0].tagName
     @modelName   = attributes.ngModel
+    @modelVal    = parse(attributes.ngModel)
     @isInput     = @tagName == 'INPUT'
     @scope       = scope
     @element     = element
@@ -15,7 +16,7 @@ class ElementUpdate
     @setPlaceholder() unless @placeholder
   watcher: ->
     eu = @
-    @scope.$watch @modelName, (updated,old) ->
+    @scope.$watch @modelVal, (updated,old) ->
       eu.updater.update(updated) unless updated == old
   bindInput: ->
     eu = @
@@ -58,9 +59,9 @@ class ElementUpdate
     @element.attr('placeholder',placeholder)
 
 angular.module 'MdUpdate', ['Factories', 'FactoryName','RailsUpdater']
-  .directive 'mdUpdate', ($timeout, factoryName, $injector, RailsUpdater) ->
+  .directive 'mdUpdate', ($timeout, factoryName, $injector, RailsUpdater,$parse) ->
     restrict: 'A'
     require:  ['ngModel','?ngCallback','?ngTrackBy']
 
     link: (scope, element, attributes, ngControllers) ->
-      new ElementUpdate(scope,element,attributes,ngControllers, RailsUpdater,$timeout)
+      new ElementUpdate(scope,element,attributes,ngControllers, RailsUpdater,$timeout,$parse)

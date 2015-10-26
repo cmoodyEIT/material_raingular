@@ -1,24 +1,29 @@
 class RailsUpdate
-  constructor: ($injector,factoryName,scope,controllers,model,override)->
+  constructor: ($injector,$parse,factoryName,scope,controllers,model,override)->
     @injector    = $injector
     @factoryName = factoryName
     @scope       = scope
-    @modelName   = (override || model).split('.')[0]
-    @atomName    = (override || model).split('.')[1]
+    modelName    = (override || model)
+    if parts = modelName.match(/(.+)\[(.+)\]/)
+      @modelName = parts[1]
+      @atomName  = $parse(parts[2])
+    else
+      [@modelName,@atomName] = modelName.split('.')
     @override    = !!override
     @factory     = @injector.get(@factoryName(@modelName))
-    @ngModelCtrl = controllers.shift()
-    @controllers = controllers
+    @controllers = controllers.slice(0)
+    @ngModelCtrl = @controllers.shift()
     return @
   equiv: (left,right) ->
     return true if left == right
     return true if (!!left && !!right) == false
     false
   update: (value) ->
-    @value = if @override then scope.$eval(@atomName) else value
+    atomName = if typeof @atomName == 'function' then @atomName(@scope) else @atomName
+    @value = if @override then scope.$eval(atomName) else value
     object = {id: @scope.$eval(@modelName).id}
     object[@modelName] = {}
-    object[@modelName][@atomName] = value
+    object[@modelName][atomName] = value
     unless @scope[@modelName].currently_updating
       @scope[@modelName].currently_updating = true
       up = @
@@ -30,6 +35,6 @@ class RailsUpdate
         for controller in up.controllers
           controller.evaluate(returnData) if !!controller
 angular.module 'RailsUpdater',  ['Factories', 'FactoryName']
-  .factory 'RailsUpdater', ($injector,factoryName) ->
+  .factory 'RailsUpdater', ($injector,factoryName,$parse) ->
     new: (scope,controllers,model,override)->
-      return new RailsUpdate($injector,factoryName,scope,controllers,model,override)
+      return new RailsUpdate($injector,$parse,factoryName,scope,controllers,model,override)
