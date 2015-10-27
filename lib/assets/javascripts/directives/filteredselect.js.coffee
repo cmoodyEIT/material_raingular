@@ -45,6 +45,12 @@ angular.module('FilteredSelect', [])
         span.append tempHolder
         element.append span
         tempHolder.append template
+      equiv = (left,right) ->
+        return true if left == right
+        return true if (!!left && !!right) == false
+        if !isNaN(left) && !isNaN(right)
+          return true if parseFloat(left) == parseFloat(right)
+        false
 
       ulHeight = ->
         full = window.innerHeight
@@ -76,15 +82,19 @@ angular.module('FilteredSelect', [])
             li = angular.element '<a class="item">' + viewValueFn(item) + '</a>'
           ip = angular.element '<input type="hidden">'
           ip.val(modelValueFn(item))
+          console.dir typeof modelValueFn(item)
           li.append(ip)
           li.bind 'mousedown', ($event)->
+            console.dir typeof $event.target.children[0].value
             updateValue($event.target.children[0].value)
           template.append(li)
       setInitialValue = ->
         unless isMobile
           obj = {}
           obj[modelValue] = ngModel.$modelValue
-          list = $filter('filter')(collection(scope), obj,true)
+          console.dir obj
+          list = $filter('filter')(collection(scope), obj,equiv)
+          console.dir list
           viewScope = list[0] if list
           search.val(if viewScope then viewValueFn(viewScope) else '')
         else
@@ -106,8 +116,7 @@ angular.module('FilteredSelect', [])
       updateValue = (model) ->
         ngModel.$setViewValue(model)
         tempHolder.removeClass('active')
-        $timeout ->
-          setInitialValue() unless isMobile
+        setInitialValue()
       done = false
       fieldset = element
       until done
