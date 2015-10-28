@@ -77,6 +77,7 @@ class StandardTemplate
   stylize: ->
     @search.addClass('md-input') if @element.hasClass('md-input')
     @search.css({'width': '100%','color': 'black'})
+    @element.css('position','relative').css('overflow','visible')
     searchCss = window.getComputedStyle(@search[0])
     @typeAhead.css('padding-left', parseFloat(searchCss["padding-left"]) + parseFloat(searchCss["margin-left"]) + parseFloat(searchCss["border-left-width"]) + 'px')
     @typeAhead.css('padding-top',  parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])  + 'px')
@@ -114,12 +115,15 @@ class EventFunctions
   focusFunction: (event) =>
     @buildTemplate()
   blurFunction: (search,event) =>
-    obj={}
-    obj[@functions.viewValue] = search.val()
-    val = @filter('filter')(@functions.collection(@scope), obj)[0]
-    @updateValue @functions.modelValueFn(val)
-    search.css
-    search.val(@functions.viewValueFn(val))
+    if search.val().length < 4
+      search.val('')
+    else
+      obj={}
+      obj[@functions.viewValue] = search.val()
+      val = @filter('filter')(@functions.collection(@scope), obj)[0]
+      @updateValue @functions.modelValueFn(val)
+      search.css
+      search.val(@functions.viewValueFn(val))
   keydownFunction: (search,typeAhead,template,input) =>
     keypress = (direction) ->
       index = if direction == 'next' then 0 else template.find('a').length - 1
