@@ -1,3 +1,4 @@
+@import "angular-material.min"
 div.filtered-select
   position: fixed
   z-index: 1001
@@ -33,12 +34,54 @@ div.filtered-select
       cursor: pointer
       box-shadow: 0 4px 2px -2px rgba(0,0,0,0.14)
   &.bottom
-    top: 67%
+    top: 50%
     z-index: 1000
     &.active
-      height: 33%
+      height: 50%
 ng-filtered-select
   display: block
   width: 100%
   overflow: hidden
   text-overflow: ellipsis
+md-autocomplete
+  background: none
+  md-autocomplete-wrap.md-whiteframe-z1
+    box-shadow: none
+    button
+      display: none
+.autocomplete.menu
+  text-align: left
+  &:empty
+    display: none
+  a
+    overflow: hidden
+    width: 100%
+    text-overflow: ellipsis
+    display: block
+    line-height: 48px
+    height: 48px
+    font-size: 14px
+    white-space: nowrap
+    cursor: pointer
+    &.active
+      font-weight: bolder
+  &:hover
+    max-height: 30rem
+    padding: 0.5rem
+    opacity: 1
+  z-index: 10
+  max-height: 0
+  overflow-y: hidden
+  overflow-x: hidden
+  position: absolute
+  background-color: white
+  opacity: 0
+  border-radius: 0.25rem
+  text-overflow: ellipsis
+  transition: all 0.55s cubic-bezier(0.25, 0.8, 0.25, 1)
+  padding: 0
+
+input.autocomplete:focus + div
+  max-height: 30rem
+  padding: 0.5rem
+  opacity: 1
