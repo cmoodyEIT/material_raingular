@@ -1,5 +1,5 @@
 class RailsUpdate
-  constructor: ($injector,$parse,factoryName,scope,controllers,model,override)->
+  constructor: ($injector,$parse,factoryName,scope,controllers,model,override,ngFactory)->
     @injector    = $injector
     @factoryName = factoryName
     @scope       = scope
@@ -10,9 +10,10 @@ class RailsUpdate
     else
       [@modelName,@atomName] = modelName.split('.')
     @override    = !!override
-    @factory     = @injector.get(@factoryName(@modelName))
+    @factory     = @injector.get(@factoryName(ngFactory || @modelName))
     @controllers = controllers.slice(0)
     @ngModelCtrl = @controllers.shift()
+    @railsName   = ngFactory || @modelName
     return @
   equiv: (left,right) ->
     return true if left == right
@@ -20,21 +21,20 @@ class RailsUpdate
     false
   update: (value) ->
     atomName = if typeof @atomName == 'function' then @atomName(@scope) else @atomName
-    @value = if @override then scope.$eval(atomName) else value
+    @value = if @override then @scope.$eval(atomName) else value
     object = {id: @scope.$eval(@modelName).id}
-    object[@modelName] = {}
-    object[@modelName][atomName] = value
+    object[@railsName] = {}
+    object[@railsName][atomName] = value
     unless @scope[@modelName].currently_updating
       @scope[@modelName].currently_updating = true
-      up = @
-      @factory.update object, (returnData) ->
-        up.scope[up.modelName].currently_updating = false
-        unless up.equiv(up.ngModelCtrl.$viewValue,returnData[up.atomName])
-          up.ngModelCtrl.$setModelValue = returnData[up.atomName]
-          up.ngModelCtrl.$render()
-        for controller in up.controllers
+      @factory.update object, (returnData) =>
+        @scope[@modelName].currently_updating = false
+        unless @equiv(@ngModelCtrl.$viewValue,returnData[@atomName])
+          @ngModelCtrl.$setModelValue = returnData[@atomName]
+          @ngModelCtrl.$render()
+        for controller in @controllers
           controller.evaluate(returnData) if !!controller
 angular.module 'RailsUpdater',  ['Factories', 'FactoryName']
   .factory 'RailsUpdater', ($injector,factoryName,$parse) ->
-    new: (scope,controllers,model,override)->
-      return new RailsUpdate($injector,$parse,factoryName,scope,controllers,model,override)
+    new: (scope,controllers,model,override,ngFactory)->
+      return new RailsUpdate($injector,$parse,factoryName,scope,controllers,model,override,ngFactory)

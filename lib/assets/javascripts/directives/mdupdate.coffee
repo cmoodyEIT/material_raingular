@@ -1,7 +1,7 @@
 class ElementUpdate
   constructor: (scope,element,attributes,controllers,RailsUpdater,timeout,parse) ->
     [@ngModelCtrl,@ngCallbackCtrl,@ngTrackByCtrl] = controllers
-    @updater     = RailsUpdater.new(scope,controllers,attributes.ngModel,attributes.ngOverride)
+    @updater     = RailsUpdater.new(scope,controllers,attributes.ngModel,attributes.ngOverride,attributes.ngFactory)
     @type        = attributes.type
     @tagName     = element[0].tagName
     @modelName   = attributes.ngModel
