@@ -98,7 +98,7 @@ class StandardTemplate
     @element.append @span
 
 class EventFunctions
-  constructor: (@functions,@buildTemplate,@updateValue,@filteredList,@filter,@timeout,@parse,@scope,@disabled) ->
+  constructor: (@functions,@buildTemplate,@updateValue,@filteredList,@filter,@timeout,@parse,@scope,@disabled,@options) ->
 
   inputFunction: (search,typeAhead,event) =>
     location = search[0].selectionStart
@@ -115,14 +115,13 @@ class EventFunctions
   focusFunction: (event) =>
     @buildTemplate()
   blurFunction: (search,event) =>
-    if search.val().length < 4
+    if search.val().length < (@options.minLength || 4)
       search.val('')
     else
       obj={}
       obj[@functions.viewValue] = search.val()
       val = @filter('filter')(@functions.collection(@scope), obj)[0]
       @updateValue @functions.modelValueFn(val)
-      search.css
       search.val(@functions.viewValueFn(val))
   keydownFunction: (search,typeAhead,template,input) =>
     keypress = (direction) ->
@@ -213,14 +212,15 @@ angular.module('FilteredSelect', [])
           elements.template.append(li)
       setInitialValue = ->
         unless isMobile
-          obj = {}
-          obj[functions.modelValue] = ngModel.$modelValue
-          list = $filter('filter')(functions.collection(scope), obj,equiv)
-          viewScope = list[0] if list
-          elements.search.val(if viewScope then functions.viewValueFn(viewScope) else '')
-          elements.typeAhead.html(elements.search.val())
+          if model = scope.$eval(attrs.ngModel)
+            obj = {}
+            obj[functions.modelValue] = scope.$eval(attrs.ngModel)
+            list = $filter('filter')(functions.collection(scope), obj,equiv)
+            viewScope = list[0] if list
+            elements.search.val(if viewScope then functions.viewValueFn(viewScope) else '')
+            elements.typeAhead.html(elements.search.val())
         else
-          unless model = ngModel.$modelValue
+          unless model = scope.$eval(attrs.ngModel)
             view = attrs.placeholder
             element.css('color','rgba(0,0,0,0.4)')
           else
@@ -251,9 +251,10 @@ angular.module('FilteredSelect', [])
           return true if fieldset[0].attributes.disabled || $parse(ngdis)(scope)
         return false
 
+      viewOptions = JSON.parse(attrs.filterOptions || '{}')
       options     = new SelectOptions(attrs.ngSelectOptions,element[0].outerHTML)
       functions   = new SelectFunctions(options.match,$parse)
-      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled())
+      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled(),viewOptions)
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
