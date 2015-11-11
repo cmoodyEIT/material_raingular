@@ -38,7 +38,7 @@ Array.prototype.includes = (entry)->
 Array.prototype.drop = (entry)->
   this.splice(this.indexOf(entry),1)
 String.prototype.titleize = ->
-  return this.replace(/\_/g,' ').replace(/\b[a-z]/g, (letter)->
+  return this.replace(/\_/g,' ').replace(/([A-Z])/g, ' $1').trim().replace(/\b[a-z]/g, (letter)->
     return letter[0].toUpperCase())
 Array.prototype.pluck = (property) ->
   return [] if !(this && property)
