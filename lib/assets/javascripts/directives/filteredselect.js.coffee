@@ -86,6 +86,7 @@ class StandardTemplate
     @search.bind 'input', (event)=>
       @inputFunction(@search,@typeAhead,event)
     @search.bind 'focus', (event)=>
+      @stylize()
       @focusFunction(event)
     @search.bind 'blur', (event)=>
       @blurFunction(@search,event)
@@ -104,12 +105,12 @@ class EventFunctions
     location = search[0].selectionStart
     if location > 3
       if @functions.viewValueFn(@filteredList()[0])
-        search.val(@functions.viewValueFn(@filteredList()[0]))
+        search.val(@functions.viewValueFn(@filteredList()[0]).replace(/^\s+/g,''))
       else
-        search.val(search.val()[0..location - 1])
+        search.val(search.val()[0..location - 1].replace(/^\s+/g,''))
       search[0].setSelectionRange(location,location)
     else
-      search.val(search.val()[0..2])
+      search.val(search.val()[0..2].replace(/^\s+/g,''))
     typeAhead.html(search.val()[0..location - 1])
     @buildTemplate()
   focusFunction: (event) =>
@@ -122,7 +123,7 @@ class EventFunctions
       obj[@functions.viewValue] = search.val()
       val = @filter('filter')(@functions.collection(@scope), obj)[0]
       @updateValue @functions.modelValueFn(val)
-      search.val(@functions.viewValueFn(val))
+      search.val(@functions.viewValueFn(val).replace(/^\s+/g,''))
   keydownFunction: (search,typeAhead,template,input) =>
     keypress = (direction) ->
       index = if direction == 'next' then 0 else template.find('a').length - 1
@@ -142,7 +143,7 @@ class EventFunctions
       selected[0].parentElement.scrollTop = scroll
       selected.addClass('active')
       location = search[0].selectionStart
-      search.val(selected.text())
+      search.val(selected.text().replace(/^\s+/g,''))
       search[0].setSelectionRange(location,location)
       typeAhead.html(selected.text()[0..location - 1])
     if input.keyCode == 40
@@ -189,7 +190,7 @@ angular.module('FilteredSelect', [])
             !!left.match(new RegExp("^" + right))
         location = elements.search[0].selectionStart || elements.search.val().length
         obj={}
-        obj[functions.viewValue] = elements.search.val()[0..location - 1] || ''
+        obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         return unless functions.collection(scope)
         fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), functions.viewValue)
         for filter in options.filters
@@ -217,7 +218,7 @@ angular.module('FilteredSelect', [])
             obj[functions.modelValue] = scope.$eval(attrs.ngModel)
             list = $filter('filter')(functions.collection(scope), obj,equiv)
             viewScope = list[0] if list
-            elements.search.val(if viewScope then functions.viewValueFn(viewScope) else '')
+            elements.search.val(if viewScope then functions.viewValueFn(viewScope).replace(/^\s+/g,'') else '')
             elements.typeAhead.html(elements.search.val())
         else
           unless model = scope.$eval(attrs.ngModel)
@@ -234,9 +235,10 @@ angular.module('FilteredSelect', [])
           element.html(view)
 
       updateValue = (model) ->
-        ngModel.$setViewValue(model)
-        elements.tempHolder.removeClass('active')
-        setInitialValue()
+        scope.$apply ->
+          ngModel.$setViewValue(model)
+          elements.tempHolder.removeClass('active')
+          setInitialValue()
       disabled = ->
         unless typeof fieldset != 'undefined'
           done = false
