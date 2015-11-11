@@ -2,6 +2,7 @@ angular.module('TextArea', [])
   .directive 'textarea', ($timeout) ->
     restrict: 'E'
     link: (scope, element, attributes) ->
+      return if element.hasClass('static')
       initialHeight = initialHeight || element[0].style.height
       element.css('resize','none').css('overflow','hidden').css('border','0px')
       initial = element.parent().css('height')
