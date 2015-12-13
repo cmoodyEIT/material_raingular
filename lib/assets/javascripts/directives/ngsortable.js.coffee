@@ -8,6 +8,13 @@ angular.module('NgSortable', [])
         scope.howToSortField(resource)
       sortableFunc = $parse(attributes.ngSortable)
       icon = element.find('i')
+      if Object.keys(attributes).includes('ngInitialSort')
+        scope.howToSortField  = sortableFunc
+        if attributes.ngInitialSort == 'reverse'
+          scope.sortableReverse = true
+          icon.addClass('up')
+        else
+          icon.addClass('down')
       icon.bind 'click', ->
         element.parent().find('i').removeClass('up')
         element.parent().find('i').removeClass('down')
