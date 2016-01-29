@@ -12,7 +12,10 @@ Array.prototype.railsMap = (func)->
   arr = []
   for obj in this
     eval args[1] + '= obj'
-    arr.push eval "(" + args[2] + ")"
+    if args[2].includes(':')
+      arr.push eval "(" + args[2] + ")"
+    else
+      arr.push eval args[2]
   arr
 Array.prototype.compact = ->
   arr = []
