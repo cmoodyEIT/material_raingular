@@ -38,11 +38,18 @@ div.filtered-select
     z-index: 1000
     &.active
       height: 50%
+fieldset[disabled]
+  ng-filtered-select
+    &[ng-mobile]
+      color: inherit
+
 ng-filtered-select
   display: block
   width: 100%
   overflow: hidden
   text-overflow: ellipsis
+  outline: none
+
 md-input-container
   ng-filtered-select
     background-color: transparent
@@ -53,6 +60,22 @@ md-input-container
       border-color: rgba(0,0,0,0.24)
       vertical-align: baseline
       background-color: transparent
+  ng-filtered-select:not([ng-mobile])
+    input
+      opacity: 0.5
+    &[disabled]
+      input
+        opacity: 1
+        color: rgba(0,0,0,0.26) !important
+        background-position: 0 bottom
+        background-size: 4px 1px
+        background-repeat: repeat-x
+        margin-bottom: -1px
+        background-image: linear-gradient(to right, rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.26) 33%, transparent 0%)
+        border-bottom-color: transparent
+      span
+        color: transparent !important
+
 md-autocomplete
   background: none
   md-autocomplete-wrap.md-whiteframe-z1

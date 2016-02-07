@@ -63,7 +63,7 @@ class MobileTemplate
 class StandardTemplate
   constructor: (@element,attrs,functions,@disabled) ->
     @span            = angular.element "<span></span>"
-    @search          = angular.element "<input style='opacity:0.5'class='autocomplete' type='search' placeholder='" + attrs.placeholder + "'>"
+    @search          = angular.element "<input class='autocomplete' type='search' placeholder='" + attrs.placeholder + "'>"
     @tempHolder      = angular.element "<div class='autocomplete menu md-whiteframe-z1'>"
     @template        = @tempHolder
     @typeAhead       = angular.element "<span style='position:absolute;'></span>"
@@ -156,7 +156,7 @@ class EventFunctions
     tempHolder.removeClass('active') if event.keyCode == 27
   mousedownFunction: (tempHolder,search,event) =>
     return if tempHolder.hasClass('active')
-    return if @disabled
+    return if @disabled()
     search.val('')
     @buildTemplate()
     tempHolder.css('top',event.clientY)
@@ -256,7 +256,7 @@ angular.module('FilteredSelect', [])
       viewOptions = JSON.parse(attrs.filterOptions || '{}')
       options     = new SelectOptions(attrs.ngSelectOptions,element[0].outerHTML)
       functions   = new SelectFunctions(options.match,$parse)
-      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled(),viewOptions)
+      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled,viewOptions)
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
@@ -268,9 +268,7 @@ angular.module('FilteredSelect', [])
       scope.$watch attrs.ngModel, (newVal,oldVal) ->
         return if newVal == oldVal
         setInitialValue()
-      scope.$watch disabled, (newVal,oldVal) ->
-        return if newVal == oldVal
+      scope.$watch disabled, (newVal) ->
         elements.search[0].disabled = newVal
-
       setInitialValue()
       buildTemplate()
