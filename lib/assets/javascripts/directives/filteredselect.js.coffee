@@ -78,7 +78,9 @@ class StandardTemplate
     @search.addClass('md-input') if @element.hasClass('md-input')
     @search.css({'width': '100%','color': 'black'})
     @element.css('position','relative').css('overflow','visible')
+    @span.css('overflow','hidden').css('width','100%').css('display','inline-block').css('position','relative')
     searchCss = window.getComputedStyle(@search[0])
+    @typeAhead.css('white-space', 'nowrap')
     @typeAhead.css('padding-left', parseFloat(searchCss["padding-left"]) + parseFloat(searchCss["margin-left"]) + parseFloat(searchCss["border-left-width"]) + 'px')
     @typeAhead.css('padding-top',  parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])  + 'px')
 
@@ -87,16 +89,16 @@ class StandardTemplate
       @inputFunction(@search,@typeAhead,event)
     @search.bind 'focus', (event)=>
       @stylize()
-      @focusFunction(event)
+      @focusFunction(@template,event)
     @search.bind 'blur', (event)=>
-      @blurFunction(@search,event)
+      @blurFunction(@search,@typeAhead,@template,event)
     @search.bind 'keydown', (event)=>
       @keydownFunction(@search,@typeAhead,@template,event)
   attachElements: ->
     @span.append @typeAhead
     @span.append @search
-    @span.append @tempHolder
     @element.append @span
+    @element.append @tempHolder
 
 class EventFunctions
   constructor: (@functions,@buildTemplate,@updateValue,@filteredList,@filter,@timeout,@parse,@scope,@disabled,@options) ->
@@ -113,9 +115,19 @@ class EventFunctions
       search.val(search.val()[0..2].replace(/^\s+/g,''))
     typeAhead.html(search.val()[0..location - 1])
     @buildTemplate()
-  focusFunction: (event) =>
+
+  focusFunction: (template,event) =>
+    template.addClass('focused')
+
     @buildTemplate()
-  blurFunction: (search,event) =>
+  setTypeAheadScroll: (search,typeAhead) =>
+    if search[0].offsetWidth < search[0].scrollWidth
+      @timeout ->
+        typeAhead.css('margin-left', '-' + search[0].scrollLeft + 'px')
+      , 1
+  blurFunction: (search,typeAhead,template,event) =>
+    template.removeClass('focused')
+    @setTypeAheadScroll(search,typeAhead)
     if search.val().length < (@options.minLength || 4)
       search.val('')
     else
@@ -124,7 +136,9 @@ class EventFunctions
       val = @filter('filter')(@functions.collection(@scope), obj)[0]
       @updateValue @functions.modelValueFn(val)
       search.val(@functions.viewValueFn(val).replace(/^\s+/g,''))
+
   keydownFunction: (search,typeAhead,template,input) =>
+    @setTypeAheadScroll(search,typeAhead)
     keypress = (direction) ->
       index = if direction == 'next' then 0 else template.find('a').length - 1
       selected = angular.element(template[0].getElementsByClassName('active')[0])
