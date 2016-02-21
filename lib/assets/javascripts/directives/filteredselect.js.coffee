@@ -19,13 +19,17 @@ class SelectOptions
       "Expected expression in form of " +
       "'_select_ (as _label_)? for (_key_,)?_value_ in _collection_'" +
       " but got '" + @unparsed + "'. Element: " + @html)
+PrimitiveValueFunction = (s,l,a,i) ->
+  return s
+
 class SelectFunctions
   constructor: (match,parse) ->
     @collection   = parse(match[8])
     @modelValue   = match[1].replace(match[5] + '.','')
     @viewValue    = if match[2] then match[2].replace(match[5] + '.','') else @modelValue
-    @viewValueFn  = parse(@viewValue || @modelValue)
-    @modelValueFn = parse(@modelValue || @viewValue)
+    @modelValueFn = if @modelValue == match[5] then PrimitiveValueFunction else parse(@modelValue || @viewValue)
+    @viewValueFn  = if @viewValue  == match[5] then PrimitiveValueFunction else parse(@viewValue || @modelValue)
+    @isPrimative  =    @viewValue  == match[5]
 
 class MobileTemplate
   constructor: (@element,functions) ->
@@ -203,8 +207,11 @@ angular.module('FilteredSelect', [])
           bool = (left,right) ->
             !!left.match(new RegExp("^" + right))
         location = elements.search[0].selectionStart || elements.search.val().length
-        obj={}
-        obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
+        if functions.isPrimative
+          obj = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
+        else
+          obj={}
+          obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         return unless functions.collection(scope)
         fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), functions.viewValue)
         for filter in options.filters
@@ -221,15 +228,20 @@ angular.module('FilteredSelect', [])
             li = angular.element '<a class="item">' + functions.viewValueFn(item) + '</a>'
           ip = angular.element '<input type="hidden">'
           ip.val(functions.modelValueFn(item))
+          ip[0].setAttribute('ng-data-type',typeof functions.modelValueFn(item))
           li.append(ip)
           li.bind 'mousedown', ($event)->
-            updateValue($event.target.children[0].value)
+            val = ($event.target.children[0].value)["to_" + $event.target.children[0].getAttribute('ng-data-type')]()
+            updateValue(val)
           elements.template.append(li)
       setInitialValue = ->
         unless isMobile
           if model = scope.$eval(attrs.ngModel)
-            obj = {}
-            obj[functions.modelValue] = scope.$eval(attrs.ngModel)
+            if functions.isPrimative
+              obj = model
+            else
+              obj = {}
+              obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,equiv)
             viewScope = list[0] if list
             elements.search.val(if viewScope then functions.viewValueFn(viewScope).replace(/^\s+/g,'') else '')
@@ -240,8 +252,11 @@ angular.module('FilteredSelect', [])
             element.css('color','rgba(0,0,0,0.4)')
           else
             element.css('color','')
-            obj = {}
-            obj[functions.modelValue] = model
+            if functions.isPrimative
+              obj = model
+            else
+              obj = {}
+              obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,true)
             viewScope = list[0] if list
             view = if viewScope then functions.viewValueFn(viewScope) else attrs.placeholder

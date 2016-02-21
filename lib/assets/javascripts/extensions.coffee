@@ -1,3 +1,9 @@
+String.prototype.to_number = ->
+  Number(this)
+String.prototype.to_string = ->
+  this.toString()
+String.prototype.to_date = ->
+  new Date(this)
 Array.prototype.empty = ->
   this.length == 0
 Array.prototype.present = ->
@@ -39,6 +45,7 @@ Array.prototype.sum = ->
 Array.prototype.includes = (entry)->
   this.indexOf(entry) > -1
 Array.prototype.drop = (entry)->
+  return this unless this.indexOf(entry) > -1
   this.splice(this.indexOf(entry),1)
 String.prototype.titleize = ->
   return this.replace(/\_/g,' ').replace(/([A-Z])/g, ' $1').trim().replace(/\b[a-z]/g, (letter)->

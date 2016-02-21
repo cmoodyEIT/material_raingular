@@ -61,6 +61,7 @@ angular.module('NgSlide', [])
           else
             element.css(margin, start)
       setHeight = (element) ->
+        return if params[2].resize == 'false'
         rect    = element[0].getBoundingClientRect()
         content = angular.element('.content')[0].getBoundingClientRect()
         height  = rect.height + rect.top - content.top unless params[0] == 'down'
@@ -69,7 +70,7 @@ angular.module('NgSlide', [])
       scope.$watch params[1], (newValue, oldValue)->
         if params[2].auto
           start = calcStart(element[0])
-          end = 0 + 'px'
+          end = params[2].finalMargin || 0 + 'px'
         if newValue
           PreviousHeight.set(angular.element('.content')[0].getBoundingClientRect().height)
           element.css(margin, end)
