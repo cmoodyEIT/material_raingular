@@ -60,7 +60,10 @@ uploadFiles = (scope,element,model,id,file,parent,timeout,callback) ->
     , 2000
 
   xhr.open("PUT", route)
-  xhr.setRequestHeader('X-CSRF-Token', $('meta[name=csrf-token]').attr('content'))
+  csrf = null
+  for tag in document.getElementsByTagName('meta')
+    csrf = tag.content if tag.name == 'csrf-token'
+  xhr.setRequestHeader('X-CSRF-Token', csrf)
   xhr.send(formData)
 
 angular.module('NgUpload', [])
@@ -69,13 +72,30 @@ angular.module('NgUpload', [])
     restrict: 'A'
     require: 'ngModel'
     link: (scope, element, attributes) ->
+      dragHovered = 0
+      el = angular.element("<div class='hovered-cover'>Drop Files Here</div>")
+      element.bind 'dragenter', (event) ->
+        dragHovered += 1
+        element.addClass('hovered') if dragHovered == 1
+        element.append el if dragHovered == 1
+        height = window.getComputedStyle(element[0]).height
+        el.css('height', height)
+        el.css('line-height',height)
+        el.css('margin-top', '-' + height)
+      element.bind 'dragleave', (event) ->
+        dragHovered -= 1
+        element.removeClass('hovered') if dragHovered == 0
+        el.remove() if dragHovered == 0
       element.bind 'dragover', (event) ->
         event.preventDefault()
         event.stopPropagation()
       element.bind 'drop', (event) ->
         event.preventDefault()
         event.stopPropagation()
-        file   = event.originalEvent.dataTransfer.files[0]
+        element.removeClass('hovered')
+        el.remove()
+        dragHovered = 0
+        file   = (event.originalEvent || event).dataTransfer.files[0]
         selectFile(scope,event,attributes,file)
       scope.file = ->
         fileData(scope,attributes)
@@ -97,7 +117,7 @@ angular.module('NgUpload', [])
         <div class="ng-progress-bar">
           <span class="bar" style="width: {{uploadProgress() || 0}}%;"></span><span class="text" style="margin-left: -{{uploadProgress() || 0}}%;">{{uploadProgress()}}%</span>
         </div>
-        <input accept="{{accept()}}" ng-model="ngModel" type="file" /><img ng-show="show(&#39;image&#39;)" ng-src="{{file().thumb}}" />
+        <input accept="{{accept()}}" ng-model="ngModel" type="file" ng-class="{image: show(&#39;image&#39;)}" /><img ng-show="show(&#39;image&#39;)" ng-src="{{file().thumb}}" />
         <div class="button" ng-show="show(&#39;button&#39;)">
           Select File
         </div>
