@@ -79,8 +79,9 @@ class StandardTemplate
     @stylize()
     @bind()
   stylize: ->
+    @search.css('width',window.getComputedStyle(@element[0]).width)
     @search.addClass('md-input') if @element.hasClass('md-input')
-    @search.css({'width': '100%','color': 'black'})
+    @search.css('color', 'black')
     @element.css('position','relative').css('overflow','visible')
     @span.css('overflow','hidden').css('width','100%').css('display','inline-block').css('position','relative')
     searchCss = window.getComputedStyle(@search[0])
