@@ -281,6 +281,12 @@ angular.module('FilteredSelect', [])
         if fieldset.length > 0
           ngdis = if fieldset[0].attributes.ngDisabled then fieldset[0].attributes.ngDisabled.value else ''
           return true if fieldset[0].attributes.disabled || $parse(ngdis)(scope)
+        form = element[0]
+        until form.nodeName == 'FORM' || !form
+          form = form.parentNode
+          break if !form
+        form ||= element[0]
+        return true if form.disabled
         return false
 
       viewOptions = JSON.parse(attrs.filterOptions || '{}')

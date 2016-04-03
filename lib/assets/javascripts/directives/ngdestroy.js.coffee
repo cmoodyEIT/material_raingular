@@ -5,6 +5,12 @@ angular.module 'NgDestroy', ['Factories']
     require: '?ngCallback'
     link: (scope, element, attributes, ngCallbackCtrl) ->
       element.bind 'click', (event) ->
+        form = element[0]
+        until form.nodeName == 'FORM' || !form
+          form = form.parentNode
+          break if !form
+        form ||= element[0]
+        return if attributes.disabled || form.disabled
         destroy(attributes.ngDestroy,attributes.ngContext)
       destroy = (modelName,listName) ->
         factory = factoryName(modelName)
