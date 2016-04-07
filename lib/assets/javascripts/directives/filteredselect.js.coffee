@@ -87,7 +87,13 @@ class StandardTemplate
     searchCss = window.getComputedStyle(@search[0])
     @typeAhead.css('white-space', 'nowrap')
     @typeAhead.css('padding-left', parseFloat(searchCss["padding-left"]) + parseFloat(searchCss["margin-left"]) + parseFloat(searchCss["border-left-width"]) + 'px')
-    @typeAhead.css('padding-top',  parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])  + 'px')
+    padding  = parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])
+    parent = @element[0]
+    until parent.tagName == 'TD'
+      break unless parent.parentNode
+      parent = parent.parentNode
+    padding += 1 unless parent.tagName == 'TD'
+    @typeAhead.css('padding-top',  padding + 'px')
 
   bind: ->
     @search.bind 'input', (event)=>
