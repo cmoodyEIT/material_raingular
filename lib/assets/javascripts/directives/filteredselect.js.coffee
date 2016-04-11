@@ -1,3 +1,4 @@
+# TODO:: Figure out how to prevent second focus on 'phase code' from changing value... class variable on focus on blur
 class SelectOptions
   REGEXP: /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?(?:\s+disable\s+when\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
       # 1: Model Value
@@ -23,13 +24,14 @@ PrimitiveValueFunction = (s,l,a,i) ->
   return s
 
 class SelectFunctions
-  constructor: (match,parse) ->
+  constructor: (match,parse,options) ->
     @collection   = parse(match[8])
     @modelValue   = match[1].replace(match[5] + '.','')
     @viewValue    = if match[2] then match[2].replace(match[5] + '.','') else @modelValue
     @modelValueFn = if @modelValue == match[5] then PrimitiveValueFunction else parse(@modelValue || @viewValue)
     @viewValueFn  = if @viewValue  == match[5] then PrimitiveValueFunction else parse(@viewValue || @modelValue)
     @isPrimative  =    @viewValue  == match[5]
+    @altValue     = parse(options.showAs)
 
 class MobileTemplate
   constructor: (@element,functions) ->
@@ -230,7 +232,6 @@ angular.module('FilteredSelect', [])
           obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         return unless functions.collection(scope)
         fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), viewOptions.orderBy || functions.viewValue)
-        console.dir fList
         for filter in options.filters
           [filterType,value] = filter.replace(/\s+/,'').split(':')
           fList = $filter(filterType)(fList, value)
@@ -262,7 +263,7 @@ angular.module('FilteredSelect', [])
               obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,equiv)
             viewScope = list[0] if list
-            val = if viewScope then functions.viewValueFn(viewScope).replace(/^\s+/g,'') else ''
+            val = if viewScope then (functions.altValue(viewScope) || functions.viewValueFn(viewScope)).replace(/^\s+/g,'') else ''
           elements.search.val(val)
           elements.typeAhead.html(elements.search.val())
         else
@@ -308,7 +309,7 @@ angular.module('FilteredSelect', [])
         return false
 
       options     = new SelectOptions(attrs.ngSelectOptions,element[0].outerHTML)
-      functions   = new SelectFunctions(options.match,$parse)
+      functions   = new SelectFunctions(options.match,$parse,viewOptions)
       eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled,viewOptions)
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
