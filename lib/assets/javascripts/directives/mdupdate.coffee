@@ -13,7 +13,7 @@ class ElementUpdate
     @timeout     = timeout
     @bindInput()          if @isInput
     @bindElement()    unless @isInput
-    @setPlaceholder() unless @placeholder
+    @setPlaceholder()     if typeof @placeholder == 'undefined'
   watcher: ->
     eu = @
     @scope.$watch @modelVal, (updated,old) ->

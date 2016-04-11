@@ -116,9 +116,11 @@ class EventFunctions
 
   inputFunction: (search,typeAhead,event) =>
     location = search[0].selectionStart
-    if location > 3
+    if location > (@options.minLength || 4) - 1
       if @functions.viewValueFn(@filteredList()[0])
-        search.val(@functions.viewValueFn(@filteredList()[0]).replace(/^\s+/g,''))
+        search.val(search.val()[0..location - 1])
+        unless [8,46].includes(@keyholder)
+          search.val(@functions.viewValueFn(@filteredList()[0]).replace(/^\s+/g,'')) if search.val().toLowerCase() == @functions.viewValueFn(@filteredList()[0]).replace(/^\s+/g,'')[0..location - 1].toLowerCase()
       else
         search.val(search.val()[0..location - 1].replace(/^\s+/g,''))
       search[0].setSelectionRange(location,location)
@@ -140,15 +142,21 @@ class EventFunctions
     template.removeClass('focused')
     @setTypeAheadScroll(search,typeAhead)
     if search.val().length < (@options.minLength || 4)
-      search.val('')
+      @updateValue('')
     else
-      obj={}
-      obj[@functions.viewValue] = search.val()
-      val = @filter('filter')(@functions.collection(@scope), obj)[0]
+      if @functions.isPrimative
+        obj = search.val()
+      else
+        obj={}
+        obj[@functions.viewValue] = search.val()
+      collection = @functions.collection(@scope)
+      if @options.allowNew
+        collection.push(obj) unless collection.includes(obj)
+      val = @filter('filter')(collection, obj, !!@options.allowNew)[0]
       @updateValue @functions.modelValueFn(val)
-      search.val(@functions.viewValueFn(val).replace(/^\s+/g,''))
 
   keydownFunction: (search,typeAhead,template,input) =>
+    @keyholder = input.keyCode
     @setTypeAheadScroll(search,typeAhead)
     keypress = (direction) ->
       index = if direction == 'next' then 0 else template.find('a').length - 1
@@ -203,6 +211,7 @@ angular.module('FilteredSelect', [])
   .directive 'ngFilteredSelect', ($parse,$filter,$timeout)->
     require: 'ngModel'
     link: (scope,element,attrs,ngModel) ->
+      viewOptions = JSON.parse(attrs.filterOptions || '{}')
       equiv = (left,right) ->
         return true if left == right
         return true if (!!left && !!right) == false
@@ -220,7 +229,8 @@ angular.module('FilteredSelect', [])
           obj={}
           obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         return unless functions.collection(scope)
-        fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), functions.viewValue)
+        fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), viewOptions.orderBy || functions.viewValue)
+        console.dir fList
         for filter in options.filters
           [filterType,value] = filter.replace(/\s+/,'').split(':')
           fList = $filter(filterType)(fList, value)
@@ -243,6 +253,7 @@ angular.module('FilteredSelect', [])
           elements.template.append(li)
       setInitialValue = ->
         unless isMobile
+          val = ''
           if model = scope.$eval(attrs.ngModel)
             if functions.isPrimative
               obj = model
@@ -251,8 +262,9 @@ angular.module('FilteredSelect', [])
               obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,equiv)
             viewScope = list[0] if list
-            elements.search.val(if viewScope then functions.viewValueFn(viewScope).replace(/^\s+/g,'') else '')
-            elements.typeAhead.html(elements.search.val())
+            val = if viewScope then functions.viewValueFn(viewScope).replace(/^\s+/g,'') else ''
+          elements.search.val(val)
+          elements.typeAhead.html(elements.search.val())
         else
           unless model = scope.$eval(attrs.ngModel)
             view = attrs.placeholder
@@ -272,7 +284,7 @@ angular.module('FilteredSelect', [])
 
       updateValue = (model) ->
         scope.$apply ->
-          ngModel.$setViewValue(model)
+          ngModel.$setViewValue(model || '')
           elements.tempHolder.removeClass('active')
           setInitialValue()
       disabled = ->
@@ -295,7 +307,6 @@ angular.module('FilteredSelect', [])
         return true if form.disabled
         return false
 
-      viewOptions = JSON.parse(attrs.filterOptions || '{}')
       options     = new SelectOptions(attrs.ngSelectOptions,element[0].outerHTML)
       functions   = new SelectFunctions(options.match,$parse)
       eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled,viewOptions)
