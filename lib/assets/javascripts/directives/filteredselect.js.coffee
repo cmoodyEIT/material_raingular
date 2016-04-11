@@ -154,7 +154,7 @@ class EventFunctions
       collection = @functions.collection(@scope)
       if @options.allowNew
         collection.push(obj) unless collection.includes(obj)
-      val = @filteredList(true,false,@options.allowNew)[0]
+      val = @filteredList(!@options.allowNew,false,@options.allowNew,true)[0]
       @updateValue @functions.modelValueFn(val)
 
   keydownFunction: (search,typeAhead,template,input) =>
@@ -220,13 +220,13 @@ angular.module('FilteredSelect', [])
         if !isNaN(left) && !isNaN(right)
           return true if parseFloat(left) == parseFloat(right)
         false
-      filteredList = (bool,model,exact)->
-        if bool
+      filteredList = (similar,model,exact,full)->
+        if similar
           bool = (left,right) ->
             !!left.match(new RegExp("^" + right))
         if exact
           bool = (left,right) -> left == right
-        location = elements.search[0].selectionStart || elements.search.val().length
+        location = (if full then null else elements.search[0].selectionStart) || elements.search.val().length
         if functions.isPrimative
           obj = if model then scope.$eval(attrs.ngModel) else elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         else
