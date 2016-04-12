@@ -154,7 +154,7 @@ class EventFunctions
       collection = @functions.collection(@scope)
       if @options.allowNew
         collection.push(obj) unless collection.includes(obj)
-      val = @filter('filter')(collection, obj, !!@options.allowNew)[0]
+      val = @filteredList(!@options.allowNew,false,@options.allowNew,true)[0]
       @updateValue @functions.modelValueFn(val)
 
   keydownFunction: (search,typeAhead,template,input) =>
@@ -220,16 +220,21 @@ angular.module('FilteredSelect', [])
         if !isNaN(left) && !isNaN(right)
           return true if parseFloat(left) == parseFloat(right)
         false
-      filteredList = (bool)->
-        if bool
+      filteredList = (similar,model,exact,full)->
+        if similar
           bool = (left,right) ->
             !!left.match(new RegExp("^" + right))
-        location = elements.search[0].selectionStart || elements.search.val().length
+        if exact
+          bool = (left,right) -> left == right
+        location = (if full then null else elements.search[0].selectionStart) || elements.search.val().length
         if functions.isPrimative
-          obj = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
+          obj = if model then scope.$eval(attrs.ngModel) else elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         else
           obj={}
-          obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
+          if model
+            obj[functions.modelValue] = scope.$eval(attrs.ngModel)
+          else
+            obj[functions.viewValue] = elements.search.val()[0..location - 1].replace(/^\s+/g,'') || ''
         return unless functions.collection(scope)
         fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), viewOptions.orderBy || functions.viewValue)
         for filter in options.filters
@@ -248,21 +253,16 @@ angular.module('FilteredSelect', [])
           ip.val(functions.modelValueFn(item))
           ip[0].setAttribute('ng-data-type',typeof functions.modelValueFn(item))
           li.append(ip)
-          li.bind 'mousedown', ($event)->
+          li.bind 'mousedown', ($event)=>
             val = ($event.target.children[0].value)["to_" + $event.target.children[0].getAttribute('ng-data-type')]()
+            @clickedVal = val
             updateValue(val)
           elements.template.append(li)
       setInitialValue = ->
         unless isMobile
           val = ''
           if model = scope.$eval(attrs.ngModel)
-            if functions.isPrimative
-              obj = model
-            else
-              obj = {}
-              obj[functions.modelValue] = model
-            list = $filter('filter')(functions.collection(scope), obj,equiv)
-            viewScope = list[0] if list
+            viewScope = filteredList(true,true,true)[0]
             val = if viewScope then (functions.altValue(viewScope) || functions.viewValueFn(viewScope)).replace(/^\s+/g,'') else ''
           elements.search.val(val)
           elements.typeAhead.html(elements.search.val())
@@ -284,6 +284,10 @@ angular.module('FilteredSelect', [])
           element.html(view)
 
       updateValue = (model) ->
+        return if @clickedVal && @clickedVal != model
+        $timeout ->
+          delete @clickedVal
+        , 300
         scope.$apply ->
           ngModel.$setViewValue(model || '')
           elements.tempHolder.removeClass('active')
