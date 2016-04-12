@@ -21,7 +21,7 @@ angular.module 'NgCreate', ['Factories', 'FactoryName']
           object[parentName + '_id']            = scope[parentName].id     if parentName.indexOf('_id') < 0
         list.create object, (returnData) ->
           if addTo
-            scope[addTo].push(returnData)
+            scope.$eval(addTo).push(returnData)
           if listName
             scope = if scope[parentName] then scope else scope.$parent
             scope[parentName] = {} unless scope[parentName]

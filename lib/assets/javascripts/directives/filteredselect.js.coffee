@@ -67,7 +67,7 @@ class MobileTemplate
       @inputFunction(event)
 
 class StandardTemplate
-  constructor: (@element,attrs,functions,@disabled) ->
+  constructor: (@element,attrs,functions,@disabled,@viewOptions) ->
     @span            = angular.element "<span></span>"
     @search          = angular.element "<input class='autocomplete' type='search' placeholder='" + attrs.placeholder + "'>"
     @tempHolder      = angular.element "<div class='autocomplete menu md-whiteframe-z1'>"
@@ -81,7 +81,7 @@ class StandardTemplate
     @stylize()
     @bind()
   stylize: ->
-    @search.css('width',window.getComputedStyle(@element[0]).width)
+    @search.css('width',@viewOptions.width || window.getComputedStyle(@element[0]).width)
     @search.addClass('md-input') if @element.hasClass('md-input')
     @search.css('color', 'black')
     @element.css('position','relative').css('overflow','visible')
@@ -314,7 +314,7 @@ angular.module('FilteredSelect', [])
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
-        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled())
+        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled(),viewOptions)
       scope.$watchCollection functions.collection, (newVal,oldVal) ->
         return if newVal == oldVal
         setInitialValue()
