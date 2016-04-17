@@ -90,12 +90,7 @@ class StandardTemplate
     @tempHolder.css('display','none') if @viewOptions.hideList
     @typeAhead.css('white-space', 'nowrap')
     @typeAhead.css('padding-left', parseFloat(searchCss["padding-left"]) + parseFloat(searchCss["margin-left"]) + parseFloat(searchCss["border-left-width"]) + 'px')
-    padding  = parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])
-    parent = @element[0]
-    until parent.tagName == 'TD' || parent.tagName == 'MD-MENU-ITEM'
-      break unless parent.parentNode
-      parent = parent.parentNode
-    padding += 1 unless parent.tagName == 'TD' || parent.tagName == 'MD-MENU-ITEM'
+    padding  = parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-bottom-width"])
     @typeAhead.css('padding-top',  padding + 'px')
 
   bind: ->
