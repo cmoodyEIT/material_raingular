@@ -67,7 +67,7 @@ class MobileTemplate
       @inputFunction(event)
 
 class StandardTemplate
-  constructor: (@element,attrs,functions,@disabled) ->
+  constructor: (@element,attrs,functions,@disabled,@viewOptions) ->
     @span            = angular.element "<span></span>"
     @search          = angular.element "<input class='autocomplete' type='search' placeholder='" + attrs.placeholder + "'>"
     @tempHolder      = angular.element "<div class='autocomplete menu md-whiteframe-z1'>"
@@ -81,20 +81,16 @@ class StandardTemplate
     @stylize()
     @bind()
   stylize: ->
-    @search.css('width',window.getComputedStyle(@element[0]).width)
+    @search.css('width',@viewOptions.width || window.getComputedStyle(@element[0]).width)
     @search.addClass('md-input') if @element.hasClass('md-input')
     @search.css('color', 'black')
     @element.css('position','relative').css('overflow','visible')
     @span.css('overflow','hidden').css('width','100%').css('display','inline-block').css('position','relative')
     searchCss = window.getComputedStyle(@search[0])
+    @tempHolder.css('display','none') if @viewOptions.hideList
     @typeAhead.css('white-space', 'nowrap')
     @typeAhead.css('padding-left', parseFloat(searchCss["padding-left"]) + parseFloat(searchCss["margin-left"]) + parseFloat(searchCss["border-left-width"]) + 'px')
-    padding  = parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-top-width"])
-    parent = @element[0]
-    until parent.tagName == 'TD'
-      break unless parent.parentNode
-      parent = parent.parentNode
-    padding += 1 unless parent.tagName == 'TD'
+    padding  = parseFloat(searchCss["padding-top"])  + parseFloat(searchCss["margin-top"])  + parseFloat(searchCss["border-bottom-width"])
     @typeAhead.css('padding-top',  padding + 'px')
 
   bind: ->
@@ -223,7 +219,7 @@ angular.module('FilteredSelect', [])
       filteredList = (similar,model,exact,full)->
         if similar
           bool = (left,right) ->
-            !!left.match(new RegExp("^" + right))
+            !!left.match(new RegExp("^" + right.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")))
         if exact
           bool = (left,right) -> left == right
         location = (if full then null else elements.search[0].selectionStart) || elements.search.val().length
@@ -318,7 +314,7 @@ angular.module('FilteredSelect', [])
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
-        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled())
+        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled(),viewOptions)
       scope.$watchCollection functions.collection, (newVal,oldVal) ->
         return if newVal == oldVal
         setInitialValue()
