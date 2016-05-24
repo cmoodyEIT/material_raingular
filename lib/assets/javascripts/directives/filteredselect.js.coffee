@@ -281,7 +281,7 @@ angular.module('FilteredSelect', [])
 
       updateValue = (model) ->
         return if @clickedVal && @clickedVal != model
-        $timeout ->
+        $timeout =>
           delete @clickedVal
         , 300
         scope.$apply ->
