@@ -62,20 +62,15 @@ class FileUpload
     return data
 
 class NgUploadEvents
-  constructor: (@element,@file_upload) ->
-    clicked = false
-    @element.children('img').bind 'click', (event) =>
-      return if clicked
+  constructor: (@element,@file_upload,@disabled) ->
+    @element.children().bind 'click', (event) =>
+      return if @disabled()
+      return if event.target.tagName == 'A'
       event.target.parentElement.getElementsByTagName('input')[0].click()
-    @element.children('.button').bind 'click', (event) =>
-      return if clicked
-      event.target.parentElement.getElementsByTagName('input')[0].click()
-    @element.children('input').bind 'click', (event) =>
-      clicked = true
     @element.children('input').bind 'change', (event) =>
+      return if @disabled()
       file   = event.target.files[0]
       @file_upload.uploadFile(file)
-      clicked = false
 
 class NgDropFileEvents
   constructor: (@element,@file_upload) ->
@@ -119,12 +114,13 @@ angular.module('NgUpload', [])
     restrict: 'E'
     replace: true,
     require: ['ngModel','?ngCallback'],
-    template:
+    template: (element,attributes) ->
+      disabled = typeof(attributes.disabled) != 'undefined'
       '<span class="ng-upload" style="outline: none">
         <div class="ng-progress-bar">
           <span class="bar" style="width: {{progress || 0}}%;"></span><span class="text" style="margin-left: -{{uploadProgress() || 0}}%;">{{uploadProgress()}}%</span>
         </div>
-        <input accept="{{accept()}}" ng-model="ngModel" type="file" ng-class="{image: file_upload_show(&#39;image&#39;)}" /><img ng-show="file_upload_show(&#39;image&#39;)" ng-src="{{file_upload_data().thumb}}" />
+        <input accept="{{accept()}}" ng-model="ngModel" type="file" ng-class="{image: file_upload_show(&#39;image&#39;)}" ' + (if disabled then 'disabled ') + '/><img ng-show="file_upload_show(&#39;image&#39;)" ng-src="{{file_upload_data().thumb}}" />
         <div class="button" ng-show="file_upload_show(&#39;button&#39;)">
           Select File
         </div>
@@ -132,8 +128,13 @@ angular.module('NgUpload', [])
 
     link: (scope, element, attributes,controllers) ->
       file_upload = new FileUpload($parse,scope,controllers,attributes.ngModel,attributes.ngOverride,element)
-      new NgUploadEvents(element,file_upload)
       options = $parse(attributes.ngUploadOptions)()
       scope.file_upload_show = (type) -> options[type]
       scope.file_upload_data =        -> file_upload.fileData()
       scope.accept           =        -> attributes.accept || '*'
+      disabled = ->
+        el = element[0]
+        until !el.parentElement
+          return true if el.getAttribute('disabled')
+          el = el.parentElement
+      new NgUploadEvents(element,file_upload,disabled)
