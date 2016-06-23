@@ -37,6 +37,7 @@ class MobileTemplate
   constructor: (@element,functions) ->
     @template          = angular.element("<ul> </ul>")
     @search            = angular.element "<input type='search' placeholder='Search'>"
+    @closeSearch       = angular.element "<button>X</button>"
     @tempHolder        = angular.element("<div class='filtered-select' ></div>")
     @body              = angular.element(document.body)
     @mousedownFunction = functions[0]
@@ -48,6 +49,7 @@ class MobileTemplate
     @attachElements()
   attachElements: ->
     @tempHolder.append @search
+    @tempHolder.append @closeSearch
     @tempHolder.append @template
     @body.append @tempHolder
   stylize: ->
@@ -57,6 +59,8 @@ class MobileTemplate
       full - @search[0].offsetHeight + 'px'
     @tempHolder.addClass('bottom') if @element.hasClass('bottom')
     @template.css('height',ulHeight())
+    @search.css('width','calc(100% - 50px)')
+    @closeSearch.css('border','none').css('background-color','rgba(0,0,0,0.1)').css('width','30px').css('padding','5px')
 
   bind: ->
     @element.bind 'mousedown', (event) =>
@@ -65,6 +69,8 @@ class MobileTemplate
       @keydownFunction(@tempHolder,event)
     @search.bind 'input', (event) =>
       @inputFunction(event)
+    @closeSearch. bind 'mousedown', (event) =>
+      @tempHolder.removeClass('active')
 
 class StandardTemplate
   constructor: (@element,attrs,functions,@disabled,@viewOptions) ->
