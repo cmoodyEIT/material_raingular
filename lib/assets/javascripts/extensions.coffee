@@ -45,8 +45,12 @@ Array.prototype.sum = ->
 Array.prototype.includes = (entry)->
   this.indexOf(entry) > -1
 Array.prototype.drop = (entry)->
-  return this unless this.indexOf(entry) > -1
-  this.splice(this.indexOf(entry),1)
+  if entry.hasOwnProperty('id')
+    index = @.pluck('id').indexOf(entry.id)
+  else
+    index = @.indexOf(entry)
+  return this unless index > -1
+  @.splice(index,1)
 String.prototype.titleize = ->
   return this.replace(/\_/g,' ').replace(/([A-Z])/g, ' $1').trim().replace(/\b[a-z]/g, (letter)->
     return letter[0].toUpperCase())
@@ -90,3 +94,19 @@ Array.prototype.where = (obj) ->
       addEntry = addEntry && equiv(entry[key], value)
     result.push(entry) if addEntry
   result
+Array.prototype.intersection = (arr) ->
+  res = []
+  for val in @
+    res.push(val) if arr.includes(val)
+  return res
+Array.prototype.intersects = (arr) ->
+  @.intersection(arr).length > 0
+Array.prototype.find = (id) ->
+  index = @.pluck('id').indexOf(id)
+  @[index]
+Array.prototype.index = (obj) ->
+  return unless obj.hasOwnProperty('id')
+  @.pluck('id').indexOf(obj.id)
+Array.prototype.update = (obj) ->
+  return unless obj.hasOwnProperty('id')
+  @[@.index(obj)] = obj
