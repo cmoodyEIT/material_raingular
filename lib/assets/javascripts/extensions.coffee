@@ -43,7 +43,9 @@ Array.prototype.sum = ->
     total += parseFloat(i) if i
   total
 Array.prototype.includes = (entry)->
-  this.indexOf(entry) > -1
+  unless entry.hasOwnProperty('id')
+    return @.indexOf(entry) > -1
+  @.pluck('id').includes(entry.id)
 Array.prototype.drop = (entry)->
   if entry.hasOwnProperty('id')
     index = @.pluck('id').indexOf(entry.id)

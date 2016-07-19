@@ -25,6 +25,7 @@ PrimitiveValueFunction = (s,l,a,i) ->
 
 class SelectFunctions
   constructor: (match,parse,options) ->
+    @repeater     = match[5]
     @collection   = parse(match[8])
     @modelValue   = match[1].replace(match[5] + '.','')
     @viewValue    = if match[2] then match[2].replace(match[5] + '.','') else @modelValue
@@ -116,7 +117,7 @@ class StandardTemplate
     @element.append @tempHolder
 
 class EventFunctions
-  constructor: (@functions,@buildTemplate,@updateValue,@filteredList,@filter,@timeout,@parse,@scope,@disabled,@options) ->
+  constructor: (@functions,@buildTemplate,@updateValue,@filteredList,@filter,@timeout,@parse,@scope,@disabled,@options,@changeFn) ->
 
   inputFunction: (search,typeAhead,event) =>
     location = search[0].selectionStart
@@ -155,8 +156,9 @@ class EventFunctions
         obj[@functions.viewValue] = search.val()
       collection = @functions.collection(@scope)
       if @options.allowNew
-        collection.push(obj) unless collection.includes(obj)
+        collection.push(obj) unless collection.pluck(@functions.viewValue).includes(obj[@functions.viewValue])
       val = @filteredList(!@options.allowNew,false,@options.allowNew,true)[0]
+      @changeFn(@scope)(val) if @changeFn
       @updateValue @functions.modelValueFn(val)
 
   keydownFunction: (search,typeAhead,template,input) =>
@@ -313,10 +315,10 @@ angular.module('FilteredSelect', [])
         form ||= element[0]
         return true if form.disabled
         return false
-
+      changeFn    = if attrs.fsChange then $parse(attrs.fsChange) else null
       options     = new SelectOptions(attrs.ngSelectOptions,element[0].outerHTML)
       functions   = new SelectFunctions(options.match,$parse,viewOptions)
-      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled,viewOptions)
+      eFunctions  = new EventFunctions(functions,buildTemplate,updateValue,filteredList,$filter,$timeout,$parse,scope,disabled,viewOptions,changeFn)
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
