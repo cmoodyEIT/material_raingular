@@ -104,7 +104,7 @@ class StandardTemplate
     @search.bind 'input', (event)=>
       @inputFunction(@search,@typeAhead,event)
     @search.bind 'focus', (event)=>
-      @stylize()
+      # @stylize() #TODO: This seemed wrong and was adding bad behavior look for repurcusions
       @focusFunction(@template,event)
     @search.bind 'blur', (event)=>
       @blurFunction(@search,@typeAhead,@template,event)
