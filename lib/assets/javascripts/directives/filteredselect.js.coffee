@@ -88,7 +88,7 @@ class StandardTemplate
     @stylize()
     @bind()
   stylize: ->
-    @search.css('width',@viewOptions.width || window.getComputedStyle(@element[0]).width)
+    @search.css('width',@viewOptions.width || '100%')
     @search.addClass('md-input') if @element.hasClass('md-input')
     @search.css('color', 'black')
     @element.css('position','relative').css('overflow','visible')
@@ -104,7 +104,7 @@ class StandardTemplate
     @search.bind 'input', (event)=>
       @inputFunction(@search,@typeAhead,event)
     @search.bind 'focus', (event)=>
-      # @stylize() #TODO: This seemed wrong and was adding bad behavior look for repurcusions
+      @stylize()
       @focusFunction(@template,event)
     @search.bind 'blur', (event)=>
       @blurFunction(@search,@typeAhead,@template,event)
