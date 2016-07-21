@@ -13,3 +13,5 @@
 *.a
 .DS_Store
 mkmf.log
+# Ignore Sublime Text's profile files
+*.sublime*
