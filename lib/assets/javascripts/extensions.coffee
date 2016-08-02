@@ -47,7 +47,7 @@ Array.prototype.includes = (entry)->
     return @.indexOf(entry) > -1
   @.pluck('id').includes(entry.id)
 Array.prototype.drop = (entry)->
-  if entry.hasOwnProperty('id')
+  if (entry || {}).hasOwnProperty('id')
     index = @.pluck('id').indexOf(entry.id)
   else
     index = @.indexOf(entry)
