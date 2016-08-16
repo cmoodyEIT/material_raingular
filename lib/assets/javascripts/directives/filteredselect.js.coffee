@@ -156,7 +156,7 @@ class EventFunctions
         obj[@functions.viewValue] = search.val()
       collection = @functions.collection(@scope)
       if @options.allowNew
-        collection.push(obj) unless collection.pluck(@functions.viewValue).includes(obj[@functions.viewValue])
+        collection.push(obj) unless (if @functions.isPrimative then collection else collection.pluck(@functions.viewValue)).includes(obj[@functions.viewValue] || obj)
       val = @filteredList(!@options.allowNew,false,@options.allowNew,true)[0]
       @changeFn(@scope)(val) if @changeFn
       @updateValue @functions.modelValueFn(val)
