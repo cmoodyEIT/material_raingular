@@ -9,7 +9,7 @@ class SelectOptions
       # 6: object item key variable name
       # 7: object item value variable name
       # 8: collection
-      # 9: track by expressionj
+      # 9: track by expression
   constructor: (@unparsed,@html) ->
     @filters  = @unparsed.split('|')
     @options  = @filters.shift()
@@ -227,6 +227,7 @@ angular.module('FilteredSelect', [])
       filteredList = (similar,model,exact,full)->
         if similar
           bool = (left,right) ->
+            return unless left
             !!left.match(new RegExp("^" + right.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")))
         if exact
           bool = (left,right) -> left == right
@@ -242,8 +243,10 @@ angular.module('FilteredSelect', [])
         return unless functions.collection(scope)
         fList = $filter('orderBy')($filter('filter')(functions.collection(scope), obj,bool), viewOptions.orderBy || functions.viewValue)
         for filter in options.filters
-          [filterType,value] = filter.replace(/\s+/,'').split(':')
-          fList = $filter(filterType)(fList, value)
+          pieces = filter.replace(/\s+/,'').split(':')
+          filterType = pieces.shift()
+          value = pieces.join(':')
+          fList = $filter(filterType)(fList, $parse(value)())
         fList
       buildTemplate = ->
         elements.template.empty()
