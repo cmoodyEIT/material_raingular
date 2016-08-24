@@ -2,8 +2,8 @@
 angular.factories
   .factory 'DateConverterInterceptor', ($q, $rootScope) ->
     request: (config)          -> config
-    requestError: (rejection)  -> rejection
+    requestError: (rejection)  -> $q.reject(rejection)
     response: (response)       ->
       new DateParser(response.data).evaluate()
       response
-    responseError: (rejection) -> rejection
+    responseError: (rejection) -> $q.reject(rejection)

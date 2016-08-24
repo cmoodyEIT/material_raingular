@@ -3,6 +3,6 @@ angular.factories
     request: (config)          ->
       config.headers.angular = true
       config
-    requestError: (rejection)  -> rejection
+    requestError: (rejection)  -> $q.reject(rejection)
     response: (response)       -> response
-    responseError: (rejection) -> rejection
+    responseError: (rejection) -> $q.reject(rejection)
