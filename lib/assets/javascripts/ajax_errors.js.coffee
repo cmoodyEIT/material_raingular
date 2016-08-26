@@ -5,8 +5,7 @@ angular.factories
       config
     requestError: (rejection)  -> $q.reject(rejection)
     response: (response)       -> response
-    responseError: (rejection) ->
+    responseError: (rejection) -> $q.reject(rejection)
       #$rootScope.xhr_errors = []
       #for error in rejection.data.errors
       #  $rootScope.xhr_errors.push(error)
-      $q.reject(rejection)
