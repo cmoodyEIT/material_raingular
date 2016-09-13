@@ -6,4 +6,6 @@ angular.factories
     response: (response)       ->
       new DateParser(response.data).evaluate()
       response
-    responseError: (rejection) -> $q.reject(rejection)
+    responseError: (rejection) ->
+      new DateParser(rejection.data).evaluate()
+      $q.reject(rejection)
