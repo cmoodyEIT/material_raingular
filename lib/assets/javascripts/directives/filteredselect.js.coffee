@@ -74,9 +74,9 @@ class MobileTemplate
       @tempHolder.removeClass('active')
 
 class StandardTemplate
-  constructor: (@element,attrs,functions,@disabled,@viewOptions) ->
+  constructor: (@element,@attrs,functions,@disabled,@viewOptions,@mdInputContainer) ->
     @span            = angular.element "<span></span>"
-    @search          = angular.element "<input class='autocomplete' type='search' placeholder='" + attrs.placeholder + "'>"
+    @search          = angular.element "<input class='autocomplete' type='search'>"
     @tempHolder      = angular.element "<div class='autocomplete menu md-whiteframe-z1'>"
     @template        = @tempHolder
     @typeAhead       = angular.element "<span style='position:absolute;'></span>"
@@ -104,12 +104,16 @@ class StandardTemplate
     @search.bind 'input', (event)=>
       @inputFunction(@search,@typeAhead,event)
     @search.bind 'focus', (event)=>
+      @mdInputContainer?.setFocused(true)
       @stylize()
       @focusFunction(@template,event)
     @search.bind 'blur', (event)=>
+      @mdInputContainer?.setHasValue(@search.val())
+      @mdInputContainer?.setFocused(false)
       @blurFunction(@search,@typeAhead,@template,event)
     @search.bind 'keydown', (event)=>
       @keydownFunction(@search,@typeAhead,@template,event)
+
   attachElements: ->
     @span.append @typeAhead
     @span.append @search
@@ -215,8 +219,10 @@ class EventFunctions
 
 angular.module('FilteredSelect', [])
   .directive 'ngFilteredSelect', ($parse,$filter,$timeout)->
-    require: 'ngModel'
-    link: (scope,element,attrs,ngModel) ->
+    require: ['ngModel', '?^mdInputContainer']
+    link: (scope,element,attrs,controllers) ->
+      ngModel = controllers[0]
+      mdInputContainer = controllers[1]
       viewOptions = JSON.parse(attrs.filterOptions || '{}')
       equiv = (left,right) ->
         return true if left == right
@@ -273,9 +279,10 @@ angular.module('FilteredSelect', [])
             val = if viewScope then (functions.altValue(viewScope) || functions.viewValueFn(viewScope)).replace(/^\s+/g,'') else ''
           elements.search.val(val)
           elements.typeAhead.html(elements.search.val())
+          mdInputContainer?.setHasValue(val)
         else
           unless model = scope.$eval(attrs.ngModel)
-            view = attrs.placeholder
+            view = ''
             element.css('color','rgba(0,0,0,0.4)')
           else
             element.css('color','')
@@ -286,9 +293,10 @@ angular.module('FilteredSelect', [])
               obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,true)
             viewScope = list[0] if list
-            view = if viewScope then functions.viewValueFn(viewScope) else attrs.placeholder
+            view = if viewScope then functions.viewValueFn(viewScope) else ''
           element.html('')
           element.html(view)
+
 
       updateValue = (model) ->
         return if @clickedVal && @clickedVal != model
@@ -325,7 +333,9 @@ angular.module('FilteredSelect', [])
       if isMobile = typeof attrs.ngMobile != 'undefined'
         elements  = new MobileTemplate(element,eFunctions.mobile())
       else
-        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled(),viewOptions)
+        elements  = new StandardTemplate(element,attrs,eFunctions.standard(),disabled(),viewOptions,mdInputContainer)
+      mdInputContainer?.setHasPlaceholder(attrs.mdPlaceholder)
+      mdInputContainer?.input = elements.search
       scope.$watchCollection functions.collection, (newVal,oldVal) ->
         return if newVal == oldVal
         setInitialValue()

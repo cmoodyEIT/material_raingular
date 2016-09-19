@@ -9,11 +9,9 @@ class ElementUpdate
     @isInput     = @tagName == 'INPUT'
     @scope       = scope
     @element     = element
-    @placeholder = attributes.placeholder
     @timeout     = timeout
     @bindInput()          if @isInput
     @bindElement()    unless @isInput
-    @setPlaceholder()     if typeof @placeholder == 'undefined'
   watcher: ->
     eu = @
     @scope.$watch @modelVal, (updated,old) ->
@@ -52,11 +50,6 @@ class ElementUpdate
         ,750
     else
       @watcher()
-  setPlaceholder: ->
-    placeholder = ''
-    for word in @modelName.split('.').pop().split('_')
-      placeholder += word[0].toUpperCase() + word[1..-1].toLowerCase() + ' '
-    @element.attr('placeholder',placeholder)
 
 angular.module 'MdUpdate', ['Factories', 'FactoryName','RailsUpdater']
   .directive 'mdUpdate', ($timeout, factoryName, $injector, RailsUpdater,$parse) ->
