@@ -6,7 +6,7 @@ namespace :material_raingular do
     factories = "angular.factories = angular.module('Factories', [])\n"
     controllers = HashWithIndifferentAccess.new
     Rails.application.routes.routes.each do |route|
-      unless route.constraints[:request_method].nil? || route.defaults[:controller].nil? || (route.app.constraints.present? rescue false)
+      unless route.constraints[:request_method].nil? || route.defaults[:controller].nil?# || (route.app.constraints.present? rescue false)
         controller = route.defaults[:controller]
         controllers[controller] ||= {}
         controllers[controller][:parent_model_name_and_format_symbol] ||= []
