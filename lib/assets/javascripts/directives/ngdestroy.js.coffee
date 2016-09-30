@@ -20,8 +20,10 @@ angular.module 'NgDestroy', ['Factories']
             list = list[childScope]
         else
           list = scope[factory]
-        list.drop(scope[modelName])
+        resource = list #Save resource for later if server returns success
         list = $injector.get(factory)
         object = {id: scope[modelName].id}
-        list.delete object, (returnData)->
+        list.delete(object).$promise #remove from server
+        .then (returnData)->
+          resource.drop(scope[modelName]) #remove from view
           ngCallbackCtrl.evaluate(returnData) if !!ngCallbackCtrl
