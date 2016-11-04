@@ -43,7 +43,7 @@ Array.prototype.sum = ->
     total += parseFloat(i) if i
   total
 Array.prototype.includes = (entry)->
-  unless entry.hasOwnProperty('id')
+  unless (entry || {}).hasOwnProperty('id')
     return @.indexOf(entry) > -1
   @.pluck('id').includes(entry.id)
 Array.prototype.drop = (entry)->
@@ -107,8 +107,8 @@ Array.prototype.find = (id) ->
   index = @.pluck('id').indexOf(id)
   @[index]
 Array.prototype.index = (obj) ->
-  return unless obj.hasOwnProperty('id')
+  return unless (obj || {}).hasOwnProperty('id')
   @.pluck('id').indexOf(obj.id)
 Array.prototype.update = (obj) ->
-  return unless obj.hasOwnProperty('id')
+  return unless (obj || {}).hasOwnProperty('id')
   @[@.index(obj)] = obj
