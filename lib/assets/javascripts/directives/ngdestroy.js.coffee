@@ -4,6 +4,7 @@ angular.module 'NgDestroy', ['Factories']
     restrict: 'A'
     require: '?ngCallback'
     link: (scope, element, attributes, ngCallbackCtrl) ->
+      console.warn "ngDestroy is deprecated. Please consider using mrDestroy in its stead."
       element.bind 'click', (event) ->
         form = element[0]
         until form.nodeName == 'FORM' || !form

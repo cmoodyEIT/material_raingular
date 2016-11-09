@@ -1,3 +1,5 @@
+# //= require_tree ./super_classes
+# //= require inflections
 # //= require extensions
 # //= require angular
 # //= require angular-route
@@ -15,10 +17,14 @@
 # //= require ajax_errors
 # //= require identifier_interceptor
 # //= require rails_updater
+# //= require_self
+# //= require_tree ./material_raingular
 
-angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag', 'NgAuthorize', 'AComplete'
+@MaterialRaingular = {
+  app: angular.module('materialRaingular', ['AutoComplete', 'NgDownload', 'NgChangeOnBlur', 'NgDrag', 'NgAuthorize', 'AComplete'
                                     'NgRepeatList', 'NgUpdate', 'NgPopup', 'NgBoolean', 'Table', 'NgWatchShow', 'NgTrackBy'
                                     'NgUpload', 'NgDestroy', 'NgCreate', 'Video','NgAuthorize', 'TextArea', 'MdUpdate'
                                     'NgSlide', 'NgMatches','NgFade','NgSwipe', 'NgLoad', 'NgWatchContent', 'RailsUpdater'
                                     'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource', 'materialFilters', 'NgCallback'
                                     'NgSortable', 'FilteredSelect'])
+}
