@@ -43,9 +43,13 @@ Array.prototype.sum = ->
     total += parseFloat(i) if i
   total
 Array.prototype.includes = (entry)->
-  unless (entry || {}).hasOwnProperty('id')
+  return @.indexOf(entry) > -1 unless entry
+  if entry instanceof Date
+    (@.map (obj) -> obj.toDateString()).includes(entry.toDateString())
+  else if entry.hasOwnProperty('id')
+    return @.pluck('id').includes(entry.id)
+  else
     return @.indexOf(entry) > -1
-  @.pluck('id').includes(entry.id)
 Array.prototype.drop = (entry)->
   if (entry || {}).hasOwnProperty('id')
     index = @.pluck('id').indexOf(entry.id)

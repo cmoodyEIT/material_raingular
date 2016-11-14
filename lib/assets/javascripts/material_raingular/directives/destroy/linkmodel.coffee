@@ -25,11 +25,12 @@ class MrDestroyModel extends AngularLinkModel
   _model:             -> @$controller[0].$viewValue
   _list:              -> @_options().list || @$scope.$eval(@_matchedExpression()[2].split('|')[0])
   _options:           -> @$scope.$eval(@$attrs.mrOptions || '{}')
-  _matchedExpression: -> @_repeatElement().getAttribute('ng-repeat').match(@REGEXP)
+  _matchedExpression: -> @_repeatStatement().match(@REGEXP)
+  _repeatStatement:   -> @_repeatElement().getAttribute('ng-repeat') || @_repeatElement().getAttribute('md-virtual-repeat')
   _repeatElement: ->
     repeatElement = @$element[0]
-    until repeatElement.hasAttribute 'ng-repeat'
-      repeatElement = repeatElement.parentNode
+    until repeatElement.hasAttribute('ng-repeat') || repeatElement.hasAttribute('md-virtual-repeat')
+      repeatElement = repeatElement.parentElement
       break if !repeatElement
     repeatElement
   _setForm: ->
