@@ -10,6 +10,14 @@ class @PanelConfig
     @openFrom            ||= @event
     @target              ||= @event.target
     @panelClass          ||= 'md-select-menu'
-  setPosition: (target,$mdPanel) ->
-    @position = $mdPanel.newPanelPosition().relativeTo(target).addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW)
+  setPosition: (target,$mdPanel,options) ->
+    options ||= {}
+    @position = $mdPanel.newPanelPosition().relativeTo(target).addPanelPosition($mdPanel.xPosition[options.x || 'ALIGN_START'], $mdPanel.yPosition[options.y || 'BELOW'])
+    return @
+  setAnimation: (type,$mdPanel,options) ->
+    options ||= {}
+    @animation ||= $mdPanel.newPanelAnimation()
+    @animation.openFrom(options.openFrom || @target)
+    @animation.closeTo(@target)
+    @animation.withAnimation($mdPanel.animation[type])
     return @
