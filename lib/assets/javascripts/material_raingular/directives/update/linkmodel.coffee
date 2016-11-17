@@ -48,7 +48,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   _type:          -> @$attrs.type
   _tagName:       -> @$element[0].tagName
   _modelName:     -> @$attrs.ngModel
-  _modelVal:      -> @ngModelCtrl.$modelValue
+  _modelVal:      -> @$parse(@$attrs.ngModel)
   _isInput:       -> @_tagName() == 'INPUT'
   _funcName: ->
     return 'textarea' if @_tagName() == 'TEXTAREA'
