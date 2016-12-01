@@ -43,6 +43,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
 
   _watcher: ->
     @$scope.$watch @_modelVal(), (updated,old) =>
+      return if old == undefined
       @updater.update(updated) unless updated == old
   _specificTypes: ['radio','date','checkbox','hidden']
   _type:          -> @$attrs.type
