@@ -9,6 +9,8 @@ class @AdminRouteModel extends AngularRouteModel
     controller: 'Admin'
   personName: -> #'/person/name'
     controller: 'Admin'
+  time__cards: -> #'/time_cards'
+    return {}
   otherwise: ->
     redirectTo: '/'
   @register(angular.app)
@@ -19,12 +21,14 @@ class @AngularRouteModel extends AngularModel
   constructor: ($routeProvider,$locationProvider)->
     for key, val of @constructor.prototype
       continue if key in ['constructor', 'initialize']
+      obj = val()
+      obj.template ||= '' unless obj.templateUrl
       unless key in ['default','otherwise']
-        route = key.replace('_','/:').tableize().singularize().replace('_','/')
+        route = key.replace(/\_/g,'/:').underscore().replace(/\_/g,'/').replace(/\/\:\/\:/g,'_')
         route = '/' + route unless route[0] is '/'
-        $routeProvider.when(route,val())
+        $routeProvider.when(route,obj)
       else if key == 'default'
-        $routeProvider.when('/',val())
+        $routeProvider.when('/',obj)
       else
-        $routeProvider.otherwise(val())
+        $routeProvider.otherwise(obj)
     return $routeProvider

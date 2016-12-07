@@ -24,11 +24,17 @@ class RailsUpdate
     atomName = if typeof @atomName == 'function' then @atomName(@scope) else @atomName
     @value = if @override then @scope.$eval(atomName) else value
     object = {id: @scope.$eval(@modelName).id}
-    object[@railsName] = {}
+    if object.id
+      func = 'update'
+      object[@railsName] = {}
+    else
+      object[@railsName] = @scope.$eval(@modelName)
+      func = 'create'
     object[@railsName][atomName] = value
     unless @scope[@modelName].currently_updating.includes(atomName)
       @scope[@modelName].currently_updating.push(atomName)
-      @factory.update object, (returnData) =>
+      @factory[func] object, (returnData) =>
+        @scope.$eval(@modelName).id = returnData.id if returnData.id
         @scope[@modelName].currently_updating.drop(atomName)
         unless @equiv(@ngModelCtrl.$viewValue,returnData[@atomName])
           @ngModelCtrl.$setModelValue = returnData[@atomName]
