@@ -6,7 +6,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl,@ngTrackByCtrl] = @$controller
-    @updater     = @RailsUpdater.new(@$scope,@$controller,@$attrs.ngModel,@$attrs.ngOverride,@$attrs.ngFactory)
+    @updater     = @RailsUpdater.new(@$scope,@$controller,@$attrs.ngModel,@$attrs.ngOverride,@_options().factory)
     @_bind()
 
   @register(Directives.MrUpdate)
@@ -46,6 +46,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
       return if old == undefined
       @updater.update(updated) unless updated == old
   _specificTypes: ['radio','date','checkbox','hidden']
+  _options:       -> @$scope.$eval(@$attrs.mrOptions || '{}')
   _type:          -> @$attrs.type
   _tagName:       -> @$element[0].tagName
   _modelName:     -> @$attrs.ngModel

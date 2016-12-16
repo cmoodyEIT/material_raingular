@@ -1,5 +1,6 @@
 # //= require material_raingular/directives/destroy/directive
 class MrDestroyModel extends AngularLinkModel
+  REPEAT_TYPES: ['ng-repeat','ng-repeat-start','md-virtual-repeat']
   REGEXP: /^\s*(.*?)\s+in\s+(.*?)(?:\s+track\s+by\s+([\s\S]+?))?$/
     # 1: model name
     # 2: collection name
@@ -26,10 +27,10 @@ class MrDestroyModel extends AngularLinkModel
   _list:              -> @_options().list || @$scope.$eval(@_matchedExpression()[2].split('|')[0])
   _options:           -> @$scope.$eval(@$attrs.mrOptions || '{}')
   _matchedExpression: -> @_repeatStatement().match(@REGEXP)
-  _repeatStatement:   -> @_repeatElement().getAttribute('ng-repeat') || @_repeatElement().getAttribute('md-virtual-repeat')
+  _repeatStatement:   -> (@REPEAT_TYPES.map (type) => @_repeatElement().getAttribute(type)).$inject('|')
   _repeatElement: ->
     repeatElement = @$element[0]
-    until repeatElement.hasAttribute('ng-repeat') || repeatElement.hasAttribute('md-virtual-repeat')
+    until (@REPEAT_TYPES.map (type) => repeatElement.hasAttribute(type)).$inject('|')
       repeatElement = repeatElement.parentElement
       break if !repeatElement
     repeatElement
