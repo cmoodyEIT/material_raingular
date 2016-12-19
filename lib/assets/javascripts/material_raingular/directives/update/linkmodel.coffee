@@ -6,9 +6,8 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl,@ngTrackByCtrl] = @$controller
-    @updater     = @RailsUpdater.new(@$scope,@$controller,@$attrs.ngModel,@$attrs.ngOverride,@_options().factory)
+    @updater     = @RailsUpdater.new(@$scope,@$controller,@$attrs.ngModel,@$attrs.ngOverride,@_factory())
     @_bind()
-
   @register(Directives.MrUpdate)
 
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
@@ -46,13 +45,14 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
       return if old == undefined
       @updater.update(updated) unless updated == old
   _specificTypes: ['radio','date','checkbox','hidden']
+  _factory:       -> @_options().factory
   _options:       -> @$scope.$eval(@$attrs.mrOptions || '{}')
-  _type:          -> @$attrs.type
+  _type:          -> @$attrs.type.toLowerCase()
   _tagName:       -> @$element[0].tagName
   _modelName:     -> @$attrs.ngModel
   _modelVal:      -> @$parse(@$attrs.ngModel)
   _isInput:       -> @_tagName() == 'INPUT'
   _funcName: ->
     return 'textarea' if @_tagName() == 'TEXTAREA'
-    return (@_specificTypes.intersection([@_tagName()])[0] || 'text') if @_isInput()
+    return (@_specificTypes.intersection([@_type()])[0] || 'text') if @_isInput()
     'other'
