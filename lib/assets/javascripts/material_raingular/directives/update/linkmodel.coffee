@@ -47,7 +47,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   _specificTypes: ['radio','date','checkbox','hidden']
   _factory:       -> @_options().factory
   _options:       -> @$scope.$eval(@$attrs.mrOptions || '{}')
-  _type:          -> @$attrs.type.toLowerCase()
+  _type:          -> @$attrs.type?.toLowerCase()
   _tagName:       -> @$element[0].tagName
   _modelName:     -> @$attrs.ngModel
   _modelVal:      -> @$parse(@$attrs.ngModel)
