@@ -80,6 +80,7 @@ angular.module('NgDrag', [])
 
   .directive 'ngDrag', ->
     link: (scope, element, attributes, ngModelCtrl) ->
+      console.warn 'ngDrag is deprecated. Please consider using mrDrag in its stead.'
       callFunction = attributes.ngDrag
       el = element[0]
       el.draggable = true
@@ -92,6 +93,7 @@ angular.module('NgDrag', [])
 
   .directive 'ngDrop', ->
     link: (scope, element, attributes, ngModelCtrl) ->
+      console.warn 'ngDrop is deprecated. Please consider using mrDrop in its stead.'
       callFunction = attributes.ngDrop
       el = element[0]
       el.droppable = true

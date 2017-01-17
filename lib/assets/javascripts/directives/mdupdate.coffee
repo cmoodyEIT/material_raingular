@@ -57,4 +57,5 @@ angular.module 'MdUpdate', ['Factories', 'FactoryName','RailsUpdater']
     require:  ['ngModel','?ngCallback','?ngTrackBy']
 
     link: (scope, element, attributes, ngControllers) ->
+      console.warn 'mdUpdate is deprecated. Please consider using mrUpdate in its stead.'
       new ElementUpdate(scope,element,attributes,ngControllers, RailsUpdater,$timeout,$parse)

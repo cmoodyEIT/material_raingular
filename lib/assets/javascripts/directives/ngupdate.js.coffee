@@ -5,6 +5,7 @@ angular.module 'NgUpdate', ['Factories', 'FactoryName']
     require: '?ngCallback'
 
     link: (scope, element, attributes, ngCallbackCtrl) ->
+      console.warn 'ngUpdate is deprecated. Please consider using mrUpdate in its stead.'
       model = attributes.ngUpdate.split('"').join('\'')
       html = element[0].outerHTML
       html = angular.element(html)

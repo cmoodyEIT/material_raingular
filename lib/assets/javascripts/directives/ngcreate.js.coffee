@@ -4,6 +4,7 @@ angular.module 'NgCreate', ['Factories', 'FactoryName']
     restrict: 'A'
     require: '?ngCallback'
     link: (scope, element, attributes, ngCallbackCtrl) ->
+      console.warn 'ngCreate is deprecated. Please consider using mrCreate in its stead.'
       element.bind 'click', (event) ->
         [parentName, listName] = attributes.ngContext.split('.') if attributes.ngContext
         attr = scope.$eval('(' + attributes.ngAttributes + ')') || {}
