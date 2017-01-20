@@ -1,4 +1,5 @@
 # //= require material_raingular/directives/create/directive
+# //= require material_raingular/helpers/ng_model_parse
 class MrCreateModel extends AngularLinkModel
   @inject(
     '$injector'
@@ -22,8 +23,7 @@ class MrCreateModel extends AngularLinkModel
 
   #Private
   _modelPieces: ->
-    @$attrs.mrCreate.split(/\.|\[/).map (piece) =>
-      if piece.includes(']') then @$scope.$eval(piece.replace(/\]/,'')) else piece
+    Helpers.NgModelParse(@$attrs.mrCreate,@$scope)
   _models: ->
     models = [@$scope]
     for piece,index in @_modelPieces()
