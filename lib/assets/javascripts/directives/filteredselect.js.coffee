@@ -64,8 +64,16 @@ class MobileTemplate
     @closeSearch.css('border','none').css('background-color','rgba(0,0,0,0.1)').css('width','30px').css('padding','5px')
 
   bind: ->
-    @element.bind 'mousedown', (event) =>
-      @mousedownFunction(@tempHolder,@search,event)
+    @element.bind 'touchstart', (event) =>
+      touch = event.touches[event.touches.length - 1]
+      @touchDetails = {
+        startX: touch.screenX
+        startY: touch.screenY
+      }
+    @element.bind 'touchend', (event) =>
+      touch = event.changedTouches[event.changedTouches.length - 1]
+      if Math.abs(@touchDetails.startX - touch.screenX) < 20 && Math.abs(@touchDetails.startY - touch.screenY) < 20
+        @mousedownFunction(@tempHolder,@search,touch.clientY)
     @body.bind 'keydown', (event) =>
       @keydownFunction(@tempHolder,event)
     @search.bind 'input', (event) =>
@@ -197,12 +205,12 @@ class EventFunctions
       keypress('previous')
   mkeydownFunction: (tempHolder,event) =>
     tempHolder.removeClass('active') if event.keyCode == 27
-  mousedownFunction: (tempHolder,search,event) =>
+  mousedownFunction: (tempHolder,search,clientY) =>
     return if tempHolder.hasClass('active')
     return if @disabled()
     search.val('')
     @buildTemplate()
-    tempHolder.css('top',event.clientY)
+    tempHolder.css('top',clientY)
     tempHolder.css('transition','none')
     @timeout ->
       tempHolder.css('transition','')
@@ -282,7 +290,7 @@ angular.module('FilteredSelect', [])
           mdInputContainer?.setHasValue(val)
         else
           unless model = scope.$eval(attrs.ngModel)
-            view = ''
+            view = attrs.placeholder
             element.css('color','rgba(0,0,0,0.4)')
           else
             element.css('color','')
@@ -293,7 +301,7 @@ angular.module('FilteredSelect', [])
               obj[functions.modelValue] = model
             list = $filter('filter')(functions.collection(scope), obj,true)
             viewScope = list[0] if list
-            view = if viewScope then functions.viewValueFn(viewScope) else ''
+            view = if viewScope then functions.viewValueFn(viewScope) else attrs.placeholder
           element.html('')
           element.html(view)
 
