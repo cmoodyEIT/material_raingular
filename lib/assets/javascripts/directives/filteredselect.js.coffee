@@ -268,16 +268,30 @@ angular.module('FilteredSelect', [])
         for item in filteredList()
           if isMobile
             li = angular.element '<li>' + functions.viewValueFn(item) + '</li>'
+            touchDetails = {}
+            li.bind 'touchstart', (event) =>
+              touch = event.touches[event.touches.length - 1]
+              touchDetails = {
+                startX: touch.screenX
+                startY: touch.screenY
+              }
+            li.bind 'touchend', (event) =>
+              touch = event.changedTouches[event.changedTouches.length - 1]
+              if Math.abs(touchDetails.startX - touch.screenX) < 20 && Math.abs(touchDetails.startY - touch.screenY) < 20
+                val = (event.target.children[0].value)["to_" + event.target.children[0].getAttribute('ng-data-type')]()
+                @clickedVal = val
+                updateValue(val)
           else
             li = angular.element '<a class="item">' + functions.viewValueFn(item) + '</a>'
+            li.bind 'mousedown', ($event)=>
+              val = ($event.target.children[0].value)["to_" + $event.target.children[0].getAttribute('ng-data-type')]()
+              @clickedVal = val
+              updateValue(val)
+
           ip = angular.element '<input type="hidden">'
           ip.val(functions.modelValueFn(item))
           ip[0].setAttribute('ng-data-type',typeof functions.modelValueFn(item))
           li.append(ip)
-          li.bind 'mousedown', ($event)=>
-            val = ($event.target.children[0].value)["to_" + $event.target.children[0].getAttribute('ng-data-type')]()
-            @clickedVal = val
-            updateValue(val)
           elements.template.append(li)
       setInitialValue = ->
         unless isMobile
