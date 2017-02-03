@@ -6,10 +6,26 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl,@ngTrackByCtrl] = @$controller
-    @updater     = @RailsUpdater.new(@$scope,@$controller,@$attrs.ngModel,@$attrs.ngOverride,@_factory())
+    [@parent,@atom] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
+    @parentVal = @$parse(@parent)
+    @atomVal   = @$parse(@atom)
+    @_resourcify()
     @_bind()
+
   @register(Directives.MrUpdate)
 
+  _resourcify: ->
+    resource = @parentVal(@$scope)
+    return if resource.$activeRecord
+    res = {}
+    for key,val of resource
+      continue if key[0] in ['$','_']
+      res[key] = val
+    url = '/' + @parent.tableize() + '/:id'
+    record = ActiveRecord.$Resource.initialize(res,url,url)
+    resource[key] = val for key,val of record
+  _update: ->
+    @parentVal(@$scope).$save()
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
     radio:    => @_boundUpdate('input',true)
@@ -23,7 +39,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   _boundUpdate: (binding,checkValid) ->
     @$element.bind binding, (event) =>
       return if !@ngModelCtrl.$valid && checkValid
-      @updater.update(@$element.val())
+      @_update()
 
   _bindText: ->
     @$element.bind 'focus', =>
@@ -37,13 +53,13 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
       return if @$element.val() == @oldValue
       @$timeout.cancel(@debounce)
       @debounce = @$timeout =>
-        @updater.update(@$element.val())
+        @_update()
       ,delay
 
   _watcher: ->
     @$scope.$watch @_modelVal(), (updated,old) =>
       return if old == undefined
-      @updater.update(updated) unless updated == old
+      @_update()
   _specificTypes: ['radio','date','checkbox','hidden']
   _factory:       -> @_options().factory
   _options:       -> @$scope.$eval(@$attrs.mrOptions || '{}')

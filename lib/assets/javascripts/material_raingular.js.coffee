@@ -18,6 +18,7 @@
 # //= require identifier_interceptor
 # //= require rails_updater
 # //= require_self
+# //= require_tree ./active_record
 # //= require_tree ./material_raingular
 
 @MaterialRaingular = {
@@ -28,3 +29,4 @@
                                     'ngRoute', 'ngMaterial', 'ngMessages', 'ngResource', 'materialFilters', 'NgCallback'
                                     'NgSortable', 'FilteredSelect'])
 }
+@ActiveRecord = {}

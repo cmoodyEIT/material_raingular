@@ -6,7 +6,8 @@ class @AngularModel extends Module
     app?[type] name, @
   #  Injects dependencies included in args
   @inject: (args...) ->
-    @$inject = args
+    @$inject ||= []
+    @$inject.merge args
 
   constructor: (args...) ->
     # Bind injected dependencies on scope ie @$scope
