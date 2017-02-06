@@ -5,7 +5,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
     'RailsUpdater'
   )
   initialize: ->
-    [@ngModelCtrl,@mrCallbackCtrl,@ngTrackByCtrl] = @$controller
+    [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     [@parent,@atom] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
     @parentVal = @$parse(@parent)
     @atomVal   = @$parse(@atom)
@@ -15,17 +15,10 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   @register(Directives.MrUpdate)
 
   _resourcify: ->
-    resource = @parentVal(@$scope)
-    return if resource.$activeRecord
-    res = {}
-    for key,val of resource
-      continue if key[0] in ['$','_']
-      res[key] = val
-    url = '/' + @parent.tableize() + '/:id'
-    record = ActiveRecord.$Resource.initialize(res,url,url)
-    resource[key] = val for key,val of record
+    ActiveRecord.$Resource._resourcify(@parentVal(@$scope),@parent.classify())
   _update: ->
-    @parentVal(@$scope).$save()
+    @_resourcify()
+    @parentVal(@$scope).$save.bind(@parentVal(@$scope))().then((data) => @mrCallbackCtrl?.evaluate(data))
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
     radio:    => @_boundUpdate('input',true)

@@ -1,9 +1,3 @@
-String.prototype.to_number = ->
-  Number(this)
-String.prototype.to_string = ->
-  this.toString()
-String.prototype.to_date = ->
-  new Date(this)
 Array.prototype.empty = ->
   this.length == 0
 Array.prototype.present = ->
@@ -57,9 +51,6 @@ Array.prototype.drop = (entry)->
     index = @.indexOf(entry)
   return this unless index > -1
   @.splice(index,1)
-String.prototype.titleize = ->
-  return this.replace(/\_/g,' ').replace(/([A-Z])/g, ' $1').trim().replace(/\b[a-z]/g, (letter)->
-    return letter[0].toUpperCase())
 Array.prototype.pluck = (property) ->
   return [] if !(this && property)
   property = String(property)
@@ -81,10 +72,6 @@ Array.prototype.unique = (filterOn) ->
         break
     newItems.push(item) if (!isDuplicate)
   return newItems
-String.prototype.to_f = ->
-  return parseFloat(this)
-String.prototype.to_i = ->
-  return parseInt(this)
 Array.prototype.dup = ->
   return @.slice(0)
 Array.prototype.where = (obj) ->
@@ -116,3 +103,13 @@ Array.prototype.index = (obj) ->
 Array.prototype.update = (obj) ->
   return unless (obj || {}).hasOwnProperty('id')
   @[@.index(obj)] = obj
+Array::reject = (func) ->
+  arr=[]
+  for item in @
+    arr.push(item) unless func(item)
+  arr
+Array::select = (func) ->
+  arr=[]
+  for item in @
+    arr.push(item) if func(item)
+  arr

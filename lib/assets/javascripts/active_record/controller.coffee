@@ -1,4 +1,4 @@
-class @ActiveRecord.Controller extends AngularServiceModel
+class ActiveRecord.Controller extends AngularServiceModel
   @$inject: ['$paramSerializer','$http']
   new:     (params,callback,error) -> @$singleRecord(params,'new','GET',callback,error)
   create:  (params,callback,error) -> @$singleRecord(params,'create','POST',callback,error)
@@ -59,15 +59,17 @@ class @ActiveRecord.Controller extends AngularServiceModel
       params = {}
     url = if route in @routes.restful then @$url(params,route,method) else route
     promise = @$http(url: url, method: method, data: params)
-    update_url  ?= @$rawUrl(params,'update','PUT')[0]
-    destroy_url ?= @$rawUrl(params,'destroy','DELETE')[0]
-    new ActiveRecord[type](promise,callback,error,update_url,destroy_url)
+    options = {
+      klass:       @__name__()
+      update_url:  update_url  || @$rawUrl(params,'update','PUT')[0]
+      destroy_url: destroy_url || @$rawUrl(params,'destroy','DELETE')[0]}
+    new ActiveRecord[type](promise,callback,error,options)
   @$addRoutes: (routes) ->
     for key,val of routes
       @::[key] = (params,callback,error)->
         type = if val.collection then '$Collection' else '$Resource'
         @$fetchRecord(params,val.url,(val.method || 'GET'),callback,error,type,val.update_url,val.destroy_url)
-# @Company.employees(id: company.id) => '/companies/:id/employees'
+
 
 ###
 Desired Syntax

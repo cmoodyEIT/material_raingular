@@ -1,6 +1,6 @@
 # //= require_tree ./super_classes
 # //= require inflections
-# //= require extensions
+# //= require_tree ./extensions
 # //= require angular
 # //= require angular-route
 # //= require angular-resource

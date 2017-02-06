@@ -1,45 +1,65 @@
 class ActiveRecord.$Resource extends Module
   @include AngularInjectableModel
-  constructor: (@$promise,callback,error,@_updateUrl,@_destroyUrl) ->
+  constructor: (@$promise,callback,error,@_options) ->
+    @$activeRecord = true
+    @_options ||= {}
     @$resolved = false
-    @$inject('$paramSerializer','$http','$q')
-    @$promise?.then(@$processResponse).then(callback,error)
+    @$inject('$paramSerializer','$http','$q','$timeout','$rootScope')
+    @$promise?.then(@$processResponse.bind(@)).then(callback,error)
   $updatingKeys: []
   $activeRecord: true
-  @initialize: (resource,update_url,destroy_url) ->
-    record = new @(null,null,null,update_url,destroy_url)
+  @initialize: (resource,options) ->
+    record = new @(null,null,null,options)
     record.$processResponse(data: resource)
     return record
-  $processResponse: (response) =>
+  @_resourcify: (obj,klass) ->
+    return if obj.$activeRecord
+    record = @initialize(obj,{klass: klass})
+    obj[key] = val for key,val of record
+
+  $deferProcessResponse: (response) ->
+    promise = @$timeout => @$processResponse.bind(@)(response,true)
+    return promise
+
+  $processResponse: (response,apply) ->
     @$resolved = true
     for key,val of response.data
       @[key] = val if @[key] == @['$' + key + '_was'] || key in @$updatingKeys
-      @['$' + key + '_was'] = val
+      @['$' + key + '_was'] = val unless key[0] in ['$','_']
     @$updatingKeys = []
     return response.data
+
+  _defaultWrap: -> @_options.klass.underscore()
+  _defaultPath: -> '/' + @_options.klass.tableize() + '/:id'
   $updateUrl:  ->
-    path = @_updateUrl.replace(':id', @.id)
+    path = @_options.updateUrl || @_defaultPath()
+    path = path.replace(':id', @.id || '').replace(/\/$/,'')
     path += '.json' unless path.match(/\.json$/)
     path
   $destroyUrl: ->
-    path = @_destroyUrl.replace(':id', @.id)
+    path = @_options.destroyUrl || @_defaultPath()
+    path = path.replace(':id', @.id)
     path += '.json' unless path.match(/\.json$/)
     path
   $save: (callback,error)->
     if @$promise
       @$promise = @$promise.then(@_save.bind(@)).then(callback,error) if (@$promise.$$state.status != 0 || !@$resolved)
     else
-      @$promise = @_save().then(callback,error)
+      @$promise = @_save.bind(@)().then(callback,error)
   _save: ->
-    res = @$paramSerializer.strip(@)
+    res = @$paramSerializer.update(@)
     unless Object.keys(res).length > 0
       defer = @$q.defer()
       defer.resolve(@)
       return defer.promise
     @$updatingKeys = Object.keys(res)
     method = if @.id then 'put' else 'post'
-    return @$http[method](@$updateUrl(),@$paramSerializer.strip(@)).then(@$processResponse)
+    params = {}
+    params[@_options.paramWrapper || @_defaultWrap()] = if @.id then @$paramSerializer.update(@) else @$paramSerializer.create(@)
+    @["$" + key + "_was"] = val for key,val of res
+    return @$http[method](@$updateUrl(),params).then(@$deferProcessResponse.bind(@))
   $destroy: (callback,error)->
-    @$promise = (if @promise then @$promise.then(@_destroy) else @_destroy()).then(callback,error)
+    @$promise.$$state.status = 0
+    @$promise = @_destroy().then(callback,error)
   _destroy: =>
-    return @$http.delete(@$destroyUrl()).then(@$processResponse)
+    return @$http.delete(@$destroyUrl()).then(@$processResponse.bind(@))

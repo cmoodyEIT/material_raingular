@@ -13,14 +13,17 @@ class MrDestroyModel extends AngularLinkModel
   initialize: ->
     @_setForm()
     @$element.bind 'click', @destroy
+    @_resourcify()
   @register(Directives.MrDestroy)
+  _resourcify: ->
+    ActiveRecord.$Resource._resourcify(@_model(),@_matchedExpression()[1].classify())
 
   destroy: =>
     return if @$attrs.disabled || @form.disabled
-    @$timeout =>
-      @_list().drop(@_model())
+    @_resourcify()
+    @$timeout => @_list().drop(@_model())
     factory = @$injector.get(@_options().factory || @factoryName(@_matchedExpression()[1]))
-    factory.destroy {id: @_model().id}, @_callBack
+    @_model().$destroy @_callBack
 
   _callBack: (data)   => @$controller[1]?.evaluate(data)
   _model:             -> @$controller[0].$viewValue
