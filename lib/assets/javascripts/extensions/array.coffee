@@ -19,7 +19,7 @@ Array::allIndicesOf = (arg) ->
   res[0..-2]
 Array::compact = ->
   arr = []
-  arr.push(i) if !!i or i == false for i in @
+  (arr.push(i) if !!i or i == false) for i in @
   arr
 Array::drop = (entry)->
   if (entry || {}).hasOwnProperty('id')
