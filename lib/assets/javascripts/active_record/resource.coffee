@@ -46,6 +46,7 @@ class ActiveRecord.$Resource extends Module
       @$promise = @$promise.then(@_save.bind(@)).then(callback,error) if (@$promise.$$state.status != 0 || !@$resolved)
     else
       @$promise = @_save.bind(@)().then(callback,error)
+    return @$promise
   _save: ->
     res = @$paramSerializer.update(@)
     unless Object.keys(res).length > 0
