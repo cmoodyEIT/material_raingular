@@ -10,4 +10,4 @@ class ActiveRecord.$Collection extends Array
     for item in response.data
       @.push(ActiveRecord.$Resource.initialize(item,@options))
     @$resolved = true
-    return response.data
+    return @

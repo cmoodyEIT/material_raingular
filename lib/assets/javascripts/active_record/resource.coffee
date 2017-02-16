@@ -32,12 +32,12 @@ class ActiveRecord.$Resource extends Module
   _defaultWrap: -> @_options.klass.underscore()
   _defaultPath: -> '/' + @_options.klass.tableize() + '/:id'
   $updateUrl:  ->
-    path = @_options.updateUrl || @_defaultPath()
+    path = @_options.update_url || @_defaultPath()
     path = path.replace(':id', @.id || '').replace(/\/$/,'')
     path += '.json' unless path.match(/\.json$/)
     path
   $destroyUrl: ->
-    path = @_options.destroyUrl || @_defaultPath()
+    path = @_options.destroy_url || @_defaultPath()
     path = path.replace(':id', @.id)
     path += '.json' unless path.match(/\.json$/)
     path

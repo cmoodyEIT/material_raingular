@@ -41,7 +41,8 @@ class ActiveRecord.Controller extends AngularServiceModel
     restful:    ['new','create','index','edit','update','show','destroy']
   $buildUrls: ->
     @_urls ||= {}
-    for item in [@parents].compact().flatten()
+    parents = if (typeof @parents == 'function') then @parents() else @parents
+    for item in [parents].compact().flatten()
       atom = if typeof item == 'string' then item else Object.keys(item)[0]
       foreignKey = item[atom]?.foreignKey || atom + '_id'
       @_urls[foreignKey] ||= {}
@@ -75,9 +76,9 @@ class ActiveRecord.Controller extends AngularServiceModel
 Desired Syntax
 class ActiveRecord.Project extends ActiveRecord.Base
   @register(angular.app)
-  @parents: [{company: {shallow: true}},{person: {only: ['index']},'organization'] # Non-Shallow routes index,create,new Shallow routes update,edit,show,destroy
+  parents: [{company: {shallow: true}},{person: {only: ['index']},'organization'] # Non-Shallow routes index,create,new Shallow routes update,edit,show,destroy
   # Alternate function snytax:
-  @parents: ->[{company: {shallow: true}},{person: {only: ['index']},'organization']
+  parents: ->[{company: {shallow: true}},{person: {only: ['index']},'organization']
 
 resulting functionality
 # New
@@ -119,8 +120,8 @@ resulting functionality
 Desired Syntax
 class ActiveRecord.Project extends ActiveRecord.Base
   @register(angular.app)
-  @__url__: -> '/not_projects'
-  @parents: [{company: {shallow: true}}]
+  __url__: -> '/not_projects'
+  parents: [{company: {shallow: true}}]
 
 resulting functionality
 # New
@@ -148,8 +149,8 @@ resulting functionality
 Desired Syntax
 class ActiveRecord.Project extends ActiveRecord.Base
   @register(angular.app)
-  @__url__: -> '/not_projects'
-  @parents: [{company: {shallow: true, url: '/not_companies/:id/something'}}]
+  __url__: -> '/not_projects'
+  parents: [{company: {shallow: true, url: '/not_companies/:id/something'}}]
 
 resulting functionality
 # New
