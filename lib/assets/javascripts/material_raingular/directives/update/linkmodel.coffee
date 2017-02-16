@@ -6,19 +6,27 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
-    [@parent,@atom] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
-    @parentVal = @$parse(@parent)
+    @parsed = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
+    @atom = @parsed.pop()
+    @parent = @parsed.pop()
+    @parentVal = ->
+      @parsedScope = @$scope
+      @parsedScope = @$parse(atom)(@parsedScope) for atom in @parsed
+      @$parse(@parent)(@parsedScope)
     @atomVal   = @$parse(@atom)
     @_resourcify()
     @_bind()
 
   @register(Directives.MrUpdate)
 
+  _klass: ->
+    @$attrs.mrUpdateKlass || @parent.classify()
   _resourcify: ->
-    ActiveRecord.$Resource._resourcify(@parentVal(@$scope),@parent.classify())
+    return unless @parentVal()
+    ActiveRecord.$Resource._resourcify(@parentVal(),@_klass())
   _update: ->
     @_resourcify()
-    @parentVal(@$scope).$save.bind(@parentVal(@$scope))().then((data) => @mrCallbackCtrl?.evaluate(data))
+    @parentVal().$save.bind(@parentVal())().then((data) => @mrCallbackCtrl?.evaluate(data))
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
     radio:    => @_boundUpdate('input',true)
