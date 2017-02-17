@@ -32,7 +32,7 @@ class testDirective extends AngularDirectiveModel
 class @AngularDirective extends AngularModel
   # Automatically registers the controller to the module
   @register: (app, name,type) ->
-    name ?= (@name || @toString().match(/function\s*(.*?)\(/)?[1]).tableize().camelize('lower').singularize()
+    name ?= (@name || @toString().match(/function\s*(.*?)\(/)?[1]).underscore().camelize('lower')
     app?[type || 'directive'] name, ['$injector', ($injector) => new @($injector)]
   constructor: ($injector) ->
     # Bind injected dependencies on scope ie @$scope
