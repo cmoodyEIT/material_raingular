@@ -27,7 +27,7 @@ class ActiveRecord.$Resource extends Module
       @[key] = val if @[key] == @['$' + key + '_was'] || key in @$updatingKeys
       @['$' + key + '_was'] = val unless key[0] in ['$','_']
     @$updatingKeys = []
-    return response.data
+    return @
 
   _defaultWrap: -> @_options.klass.underscore()
   _defaultPath: -> '/' + @_options.klass.tableize() + '/:id'
