@@ -12,9 +12,11 @@ class ActiveRecord.$Resource extends Module
     record = new @(null,null,null,options)
     record.$processResponse(data: resource)
     return record
-  @_resourcify: (obj,klass) ->
+  @_resourcify: (obj,klass,options) ->
     return if obj.$activeRecord
-    record = @initialize(obj,{klass: klass})
+    options ||= {}
+    options.klass = klass
+    record = @initialize(obj,options)
     obj[key] = val for key,val of record
 
   $deferProcessResponse: (response) ->
@@ -57,6 +59,7 @@ class ActiveRecord.$Resource extends Module
     method = if @.id then 'put' else 'post'
     params = {}
     params[@_options.paramWrapper || @_defaultWrap()] = if @.id then @$paramSerializer.update(@) else @$paramSerializer.create(@)
+    @$beforeSave?(params)
     @["$" + key + "_was"] = val for key,val of res
     return @$http[method](@$updateUrl(),params).then(@$deferProcessResponse.bind(@))
   $destroy: (callback,error)->
