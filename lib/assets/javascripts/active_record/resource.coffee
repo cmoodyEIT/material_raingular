@@ -63,7 +63,7 @@ class ActiveRecord.$Resource extends Module
     @["$" + key + "_was"] = val for key,val of res
     return @$http[method](@$updateUrl(),params).then(@$deferProcessResponse.bind(@))
   $destroy: (callback,error)->
-    @$promise.$$state.status = 0
+    @$promise?.$$state.status = 0
     @$promise = @_destroy().then(callback,error)
   _destroy: =>
     return @$http.delete(@$destroyUrl()).then(@$processResponse.bind(@))
