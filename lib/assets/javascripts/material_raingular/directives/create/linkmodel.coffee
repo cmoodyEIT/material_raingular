@@ -14,12 +14,12 @@ class MrCreateModel extends AngularLinkModel
   create: ($event) =>
     factory = @_parentFactory()?['create_' + @_modelName().singularize()] || @_factory().create
     factory @_params(), (data) =>
-      @CallbackCtrl.evaluate(data) if @CallbackCtrl
       @$timeout =>
         if @_isCollection()
           @_models().last().push(data)
         else
           @_parentModel()[@_modelName()] = data
+        @CallbackCtrl.evaluate(data) if @CallbackCtrl
 
   #Private
   _modelPieces: ->

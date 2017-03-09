@@ -20,7 +20,7 @@ class RailsUpdate
     return true if (!!left && !!right) == false
     false
   update: (value) ->
-    @scope[@modelName].currently_updating = [] unless @scope[@modelName].currently_updating
+    @scope[@modelName].$currentlyUpdating = [] unless @scope[@modelName].$currentlyUpdating
     atomName = if typeof @atomName == 'function' then @atomName(@scope) else @atomName
     @value = if @override then @scope.$eval(atomName) else value
     object = {id: @scope.$eval(@modelName).id}
@@ -31,11 +31,11 @@ class RailsUpdate
       object[@railsName] = @scope.$eval(@modelName)
       func = 'create'
     object[@railsName][atomName] = value
-    unless @scope[@modelName].currently_updating.includes(atomName)
-      @scope[@modelName].currently_updating.push(atomName)
+    unless @scope[@modelName].$currentlyUpdating.includes(atomName)
+      @scope[@modelName].$currentlyUpdating.push(atomName)
       @factory[func] object, (returnData) =>
         @scope.$eval(@modelName).id = returnData.id if returnData.id
-        @scope[@modelName].currently_updating.drop(atomName)
+        @scope[@modelName].$currentlyUpdating.drop(atomName)
         unless @equiv(@ngModelCtrl.$viewValue,returnData[@atomName])
           @ngModelCtrl.$setModelValue = returnData[@atomName]
           @ngModelCtrl.$render()
