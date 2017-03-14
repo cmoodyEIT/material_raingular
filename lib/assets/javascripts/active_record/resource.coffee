@@ -65,5 +65,5 @@ class ActiveRecord.$Resource extends Module
   $destroy: (callback,error)->
     @$promise?.$$state.status = 0
     @$promise = @_destroy().then(callback,error)
-  _destroy: =>
+  _destroy: ->
     return @$http.delete(@$destroyUrl()).then(@$processResponse.bind(@))
