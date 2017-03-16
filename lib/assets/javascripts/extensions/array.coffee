@@ -43,7 +43,7 @@ Array::flatten = ->
 Array::includes = (entry)->
   return @indexOf(entry) > -1 unless entry
   if entry instanceof Date
-    (@map (obj) -> obj.toDateString()).includes(entry.toDateString())
+    (@map (obj) -> obj?.toDateString?()).includes(entry.toDateString())
   else if entry.hasOwnProperty('id')
     return @pluck('id').includes(entry.id)
   else
