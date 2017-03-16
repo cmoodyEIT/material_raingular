@@ -7,6 +7,7 @@ class $paramSerializer extends AngularServiceModel
     for key,val of @strip(obj)
       continue if val == obj['$' + key + '_was']
       continue if val?.toString() == obj['$' + key + '_was']?.toString()
+      continue if [undefined,null].includes(val) && [undefined,null].includes(obj["$#{key}_was"])
       res[key] = val
     res
   strip: (obj) ->

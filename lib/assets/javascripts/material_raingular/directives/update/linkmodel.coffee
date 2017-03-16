@@ -2,7 +2,6 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   @inject(
     '$parse'
     '$timeout'
-    'RailsUpdater'
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
