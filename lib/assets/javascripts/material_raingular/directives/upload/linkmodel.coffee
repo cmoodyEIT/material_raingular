@@ -2,23 +2,22 @@
 # //= require material_raingular/directives/upload/events
 class DirectiveModels.MrUploadModel extends AngularLinkModel
   @inject(
-    '$timeout'
-    'RailsUpdater'
+    '$injector'
   )
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     [@model,@key] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
-    @fileUpload = new Helpers.FileUpload(@$scope,@model,@key,@$element,@callback)
+    @fileUpload = new Helpers.FileUpload(@$scope,@model,@key,@$element,@callback.bind(@),@$injector)
     @options = @$scope.$eval(@$attrs.mrUploadOptions)
     new Modules.MrUploadEvents(@$element,@fileUpload,@disabled)
-  callback: (data) =>
-    @$scope.$apply =>
-      @$scope[@model][@key] = data[@key]
-      @$scope[@model].thumb = data.thumb
-      @$scope[@model].id    = data.id unless @$scope[@model].id
-      @$scope.progress = 100
-      @$element.removeClass('covered')
-      @mrCallbackCtrl?.evaluate(data)
+  callback: (data) ->
+    console.dir data
+    @$scope[@model][@key] = data[@key]
+    @$scope[@model].thumb = data.thumb
+    @$scope[@model].id    = data.id unless @$scope[@model].id
+    @$scope.progress = 100
+    @$element.removeClass('covered')
+    @mrCallbackCtrl?.evaluate(data)
 
   fileData: ->
     data = {}
