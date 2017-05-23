@@ -45,7 +45,6 @@ class ActiveRecord.$Resource extends Module
     path
   $save: (callback,error)->
     if @$promise
-      console.dir (@$promise.$$state.status != 0 || !@$resolved)
       @$promise = @$promise.then(@_save.bind(@)).then(callback,error) if (@$promise.$$state.status != 0 || !@$resolved)
     else
       @$promise = @_save.bind(@)().then(callback,error)

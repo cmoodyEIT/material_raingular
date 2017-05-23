@@ -38,18 +38,12 @@ class Helpers.FileUpload
           else
             reject(JSON.parse xhr.responseText)
         xhr.send(formData)
-    # @model.$promise.then promise
-    # if (@$promise.$$state.status != 0 || !@$resolved)
-    # promise
     @model.$promise = @model.$promise.then(promise.bind(@)).then(@success.bind(@),@failed.bind(@))
-    # @model.$promise.then @success.bind(@),@failed.bind(@)
-  success: (data) ->
-    console.dir data
-    @callback(data)
+    @model.$promise.then(@model.$save.bind(@model))
+  success: (data) -> @callback(data)
   failed: (data) ->
     @element.addClass('failed')
-
-    @$injector.get('$timeout') =>
+    @$timeout =>
       @element.removeClass('failed')
       @element.removeClass('covered')
     , 2000

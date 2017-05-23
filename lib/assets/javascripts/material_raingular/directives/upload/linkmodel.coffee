@@ -11,7 +11,6 @@ class DirectiveModels.MrUploadModel extends AngularLinkModel
     @options = @$scope.$eval(@$attrs.mrUploadOptions)
     new Modules.MrUploadEvents(@$element,@fileUpload,@disabled)
   callback: (data) ->
-    console.dir data
     @$scope[@model][@key] = data[@key]
     @$scope[@model].thumb = data.thumb
     @$scope[@model].id    = data.id unless @$scope[@model].id
