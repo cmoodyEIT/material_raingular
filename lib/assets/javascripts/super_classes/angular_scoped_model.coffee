@@ -1,14 +1,17 @@
 # //= require ./angular_model
 class @AngularScopedModel extends AngularModel
   @inject: (args...) ->
-    args.push('$scope','$rootScope','$routeParams')
+    args.push('$scope','$rootScope','$routeParams','$controller')
     @$inject = args
-
+  @extendController: (args...) ->
+    @$extendedControllers = args
   constructor: (args...) ->
     # Bind injected dependencies on scope ie @$scope
     for key, index in @constructor.$inject || []
       @[key] = args[index]
-
+    # extend controllers
+    for name in @constructor.$extendedControllers || []
+      angular.extend @, @$controller name, {$scope: @$scope}
     # Bind all functions not begining with _ to scope
     for key, val of @constructor.prototype
       continue if key in ['constructor', 'initialize'] or key[0] is '_'
