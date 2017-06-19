@@ -25,6 +25,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
     ActiveRecord.$Resource._resourcify(@parentVal(),@_klass())
   _update: ->
     @_resourcify()
+    return unless @parentVal()
     @parentVal().$save.bind(@parentVal())().then((data) => @mrCallbackCtrl?.evaluate(data))
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
