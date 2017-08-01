@@ -16,7 +16,7 @@ class MrDestroyModel extends AngularLinkModel
     @_resourcify()
   @register(Directives.MrDestroy)
   _resourcify: ->
-    ActiveRecord.$Resource._resourcify(@_model(),@_matchedExpression()[1].classify())
+    ActiveRecord.$Resource._resourcify(@_model(),@_factory())
 
   destroy: =>
     return if @$attrs.disabled || @form.disabled
@@ -29,6 +29,7 @@ class MrDestroyModel extends AngularLinkModel
   _model:             -> @$controller[0].$viewValue
   _list:              -> @_options().list || @$scope.$eval(@_matchedExpression()[2].split('|')[0])
   _options:           -> @$scope.$eval(@$attrs.mrOptions || '{}')
+  _factory:           -> @_options().factory || @_matchedExpression()[1].classify()
   _matchedExpression: -> @_repeatStatement().match(@REGEXP)
   _repeatStatement:   -> (@REPEAT_TYPES.map (type) => @_repeatElement().getAttribute(type)).$inject('|')
   _repeatElement: ->

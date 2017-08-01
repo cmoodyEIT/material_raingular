@@ -19,7 +19,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   @register(Directives.MrUpdate)
 
   _klass: ->
-    @$attrs.mrUpdateKlass || @parent.classify()
+    @$attrs.mrUpdateKlass || @_factory() || @parent.classify()
   _resourcify: ->
     return unless @parentVal()
     ActiveRecord.$Resource._resourcify(@parentVal(),@_klass())
