@@ -50,11 +50,14 @@ class ActiveRecord.$Resource extends Module
       @$promise = @_save.bind(@)().then(callback,error)
     return @$promise
   _save: ->
-    res = @$paramSerializer.update(@)
-    unless Object.keys(res).length > 0
-      defer = @$q.defer()
-      defer.resolve(@)
-      return defer.promise
+    if @id
+      res = @$paramSerializer.update(@)
+      unless Object.keys(res).length > 0
+        defer = @$q.defer()
+        defer.resolve(@)
+        return defer.promise
+    else
+      res = @$paramSerializer.create(@)
     @$updatingKeys = Object.keys(res)
     method = if @.id then 'put' else 'post'
     params = {}

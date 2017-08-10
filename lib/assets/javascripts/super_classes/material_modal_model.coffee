@@ -15,7 +15,7 @@ class @MaterialModalModel extends AngularScopedModel
       @[key] = args[index]
     for key in @constructor.$locals || []
       @$scope[key] = @[key]
-    @$scope.hide = @$scope.cancel = @$scope.close = @$mdDialog.hide
+    @$scope[key] = @$mdDialog.hide for key in ['hide','cancel','close']
 
     # Bind all functions not begining with _ to scope
     for key, val of @constructor.prototype
