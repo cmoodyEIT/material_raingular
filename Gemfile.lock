@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    material_raingular (0.6.4)
+    material_raingular (0.6.5)
       js-routes
 
 GEM

@@ -17,7 +17,7 @@ class ActiveRecord.Controller extends AngularServiceModel
     @$buildUrls() unless @_urls
     key = Object.keys(params || {}).intersection(Object.keys(@_urls))[0]
     path = @_urls[key][route] if key && route
-    path ||= @__url__()
+    path ||= if route in @routes.restful then @__url__() else route
     replacements = {new: 'new',edit: ':id/edit'}
     path = path.replace(':id',replacements[route]) if route in Object.keys(replacements)
     additionals={}
@@ -58,8 +58,7 @@ class ActiveRecord.Controller extends AngularServiceModel
       error = callback
       callback = params
       params = {}
-    url = if route in @routes.restful then @$url(params,route,method) else route
-    promise = @$http(url: url, method: method, data: params)
+    promise = @$http(url: @$url(params,route,method), method: method, data: params)
     options = {
       klass:       @__name__()
       update_url:  update_url  || @$rawUrl(params,'update','PUT')[0]
