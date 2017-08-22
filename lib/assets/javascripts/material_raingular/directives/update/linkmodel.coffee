@@ -6,12 +6,17 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     @parsed = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
-    @atom = @parsed.pop()
-    @parent = @parsed.pop()
-    @parentVal = ->
-      @parsedScope = @$scope
-      @parsedScope = @$parse(atom)(@parsedScope) for atom in @parsed
-      @$parse(@parent)(@parsedScope)
+    @atom   = @parsed.pop()
+    console.dir @$attrs.mrUpdate
+    if @$attrs.mrUpdate == true
+      @parent = @parsed.pop()
+      @parentVal = ->
+        @parsedScope = @$scope
+        @parsedScope = @$parse(atom)(@parsedScope) for atom in @parsed
+        @$parse(@parent)(@parsedScope)
+    else
+      @parent == @$attrs.mrUpdate
+      @parentVal = -> @$parse(@parent)(@$scope)
     @atomVal   = @$parse(@atom)
     @_resourcify()
     @_bind()
@@ -34,7 +39,7 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
     checkbox: => @_boundUpdate('click')
     hidden:   => @_watcher()
     text:     => @_bindText()
-    textarea: => @_bindDebounce(750,'keyup')
+    textarea: => @_bindDebounce(750,'input')
     other:    => @_watcher()
 
   _boundUpdate: (binding,checkValid) ->
