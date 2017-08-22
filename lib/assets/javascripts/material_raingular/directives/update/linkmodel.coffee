@@ -6,12 +6,16 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     @parsed = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
-    @atom = @parsed.pop()
-    @parent = @parsed.pop()
-    @parentVal = ->
-      @parsedScope = @$scope
-      @parsedScope = @$parse(atom)(@parsedScope) for atom in @parsed
-      @$parse(@parent)(@parsedScope)
+    @atom   = @parsed.pop()
+    if @$attrs.mrUpdate
+      @parent = @$attrs.mrUpdate
+      @parentVal = -> @$parse(@parent)(@$scope)
+    else
+      @parent = @parsed.pop()
+      @parentVal = ->
+        @parsedScope = @$scope
+        @parsedScope = @$parse(atom)(@parsedScope) for atom in @parsed
+        @$parse(@parent)(@parsedScope)
     @atomVal   = @$parse(@atom)
     @_resourcify()
     @_bind()
@@ -29,12 +33,12 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
     @parentVal().$save.bind(@parentVal())().then((data) => @mrCallbackCtrl?.evaluate(data))
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
-    radio:    => @_boundUpdate('input',true)
+    radio:    => @_boundUpdate('change',true)
     date:     => @_boundUpdate('input',true)
     checkbox: => @_boundUpdate('click')
     hidden:   => @_watcher()
     text:     => @_bindText()
-    textarea: => @_bindDebounce(750,'keyup')
+    textarea: => @_bindDebounce(750,'input')
     other:    => @_watcher()
 
   _boundUpdate: (binding,checkValid) ->
