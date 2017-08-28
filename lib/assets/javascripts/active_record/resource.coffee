@@ -26,7 +26,7 @@ class ActiveRecord.$Resource extends Module
   $processResponse: (response,apply) ->
     @$resolved = true
     for key,val of response.data
-      @[key] = val if @[key] == @['$' + key + '_was'] || key in @$updatingKeys
+      @[key] = val if angular.equals(@[key],@['$' + key + '_was']) || key in @$updatingKeys
       @['$' + key + '_was'] = angular.copy(val) unless key[0] in ['$','_']
     @$updatingKeys = []
     return @
