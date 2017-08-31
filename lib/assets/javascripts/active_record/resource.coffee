@@ -49,6 +49,18 @@ class ActiveRecord.$Resource extends Module
     else
       @$promise = @_save.bind(@)().then(callback,error)
     return @$promise
+  $reload: (callback,error)->
+    if @$promise
+      @$promise = @$promise.then(@_reload.bind(@)).then(callback,error) if (@$promise.$$state.status != 0 || !@$resolved)
+    else
+      @$promise = @_reload.bind(@)().then(callback,error)
+    return @$promise
+  _reload: ->
+    return unless @id
+    res = @$paramSerializer.create(@)
+    @["$" + key + "_was"] = val for key,val of res
+    return @$http.get(@$updateUrl()).then(@$deferProcessResponse.bind(@))
+
   _save: ->
     if @id
       res = @$paramSerializer.update(@)
