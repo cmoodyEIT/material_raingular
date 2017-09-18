@@ -6,7 +6,7 @@ class ActiveRecord.$Resource extends Module
     @$resolved = false
     @$inject('$paramSerializer','$http','$q','$timeout','$rootScope')
     @$promise?.then(@$processResponse.bind(@)).then(callback,error)
-  $updatingKeys: []
+  # $updatingKeys: []
   $activeRecord: true
   @initialize: (resource,options) ->
     record = new @(null,null,null,options)
@@ -26,9 +26,9 @@ class ActiveRecord.$Resource extends Module
   $processResponse: (response,apply) ->
     @$resolved = true
     for key,val of response.data
-      @[key] = val if angular.equals(@[key],@['$' + key + '_was']) || key in @$updatingKeys
+      @[key] = val if angular.equals(@[key],@['$' + key + '_was'])# || key in @$updatingKeys
       @['$' + key + '_was'] = angular.copy(val) unless key[0] in ['$','_']
-    @$updatingKeys = []
+    # @$updatingKeys = []
     return @
 
   _defaultWrap: -> @_options.klass.underscore()
@@ -70,7 +70,7 @@ class ActiveRecord.$Resource extends Module
         return defer.promise
     else
       res = @$paramSerializer.create(@)
-    @$updatingKeys = Object.keys(res)
+    # @$updatingKeys = Object.keys(res)
     method = if @.id then 'put' else 'post'
     params = {}
     params[@_options.paramWrapper || @_defaultWrap()] = if @.id then @$paramSerializer.update(@) else @$paramSerializer.create(@)
