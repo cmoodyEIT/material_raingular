@@ -8,7 +8,7 @@ class DirectiveModels.MrUploadModel extends AngularLinkModel
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     [@model,@key] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
     @fileUpload = new Helpers.FileUpload(@$scope,@model,@key,@$element,@callback.bind(@),@$injector)
-    @options = @$scope.$eval(@$attrs.mrUploadOptions)
+    @options = @$scope.$eval(@$attrs.mrUploadOptions || '{}')
     new Modules.MrUploadEvents(@$element,@fileUpload,@disabled)
   callback: (data) ->
     @$scope[@model][@key] = data[@key]
