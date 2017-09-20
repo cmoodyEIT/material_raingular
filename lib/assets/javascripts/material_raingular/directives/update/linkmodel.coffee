@@ -30,7 +30,9 @@ class DirectiveModels.MrUpdateModel extends AngularLinkModel
   _update: ->
     @_resourcify()
     return unless @parentVal()
-    @parentVal().$save.bind(@parentVal())().then((data) => @mrCallbackCtrl?.evaluate(data))
+    result = @parentVal().$save.bind(@parentVal())()
+    result.then @ngModelCtrl.$setPristine.bind(@ngModelCtrl)
+    result.then((data) => @mrCallbackCtrl?.evaluate(data))
   _bind: -> @$timeout => @_bindInput()[@_funcName()]()
   _bindInput: =>
     radio:    => @_boundUpdate('change',true)
