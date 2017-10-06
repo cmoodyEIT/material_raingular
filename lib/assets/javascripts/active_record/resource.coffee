@@ -29,7 +29,10 @@ class ActiveRecord.$Resource extends Module
       continue if key[0] in ['$','_']
       @[key] = val if angular.equals(@[key],@['$' + key + '_was'])# || key in @$updatingKeys
       continue if ActiveRecord.$Collection.isCollection(val)
-      @['$' + key + '_was'] = angular.copy(val) unless key[0] in ['$','_']
+      try
+        @['$' + key + '_was'] = angular.copy(val) unless key[0] in ['$','_']
+      catch
+        @['$' + key + '_was'] = val unless key[0] in ['$','_']
     # @$updatingKeys = []
     return @
 
