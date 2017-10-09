@@ -21,6 +21,6 @@ class $paramSerializer extends AngularServiceModel
   create: (obj) ->
     res = {}
     for key,val of @strip(obj)
-      continue unless val
+      continue if typeof val == 'undefined'
       res[key] = val
     res
