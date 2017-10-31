@@ -33,7 +33,6 @@ class ActiveRecord.$Resource extends Module
         @['$' + key + '_was'] = angular.copy(val) unless key[0] in ['$','_']
       catch
         @['$' + key + '_was'] = val unless key[0] in ['$','_']
-    # @$updatingKeys = []
     return @
 
   _defaultWrap: -> @_options.klass.underscore()
@@ -62,8 +61,9 @@ class ActiveRecord.$Resource extends Module
     return @$promise
   _reload: ->
     return unless @id
-    res = @$paramSerializer.create(@)
-    @["$" + key + "_was"] = val for key,val of res
+    for key,val of @
+      continue unless (match = key.match(/^\$(.*)\_was$/))
+      @[key] = @[match[1]]
     return @$http.get(@$updateUrl()).then(@$deferProcessResponse.bind(@))
 
   _save: ->
