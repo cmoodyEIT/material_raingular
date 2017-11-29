@@ -1,6 +1,6 @@
 # //= require material_raingular/directives/drop_file/drop_events
 class DirectiveModels.MrDropFileModel extends AngularLinkModel
-  @inject('$injector')
+  @inject('$injector','$timeout')
   initialize: ->
     [@ngModelCtrl,@mrCallbackCtrl] = @$controller
     [@model,@key] = Helpers.NgModelParse(@$attrs.ngModel,@$scope)
@@ -8,7 +8,7 @@ class DirectiveModels.MrDropFileModel extends AngularLinkModel
     new Modules.MrDropFileEvents(@$element,@fileUpload)
 
   callback: (data) =>
-    @$scope.$apply =>
+    @$timeout =>
       @$scope[@model][@key] = data[@key]
       @$scope[@model].thumb = data.thumb
       @$scope[@model].id    = data.id unless @$scope[@model].id
